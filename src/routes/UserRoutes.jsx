@@ -6,16 +6,17 @@ import Signup from '../pages/user/Signup'
 import SignupOtp from '../pages/user/SignupOtp'
 import ForgotPassword from '../pages/user/ForgotPassword'
 import OTP from '../pages/user/OTP'
+import PrivateRoute from '../components/user/PrivateRoutes'
 
 const UserRoutes = () => {
   return (
     <Routes>
       <Route path='/' element={<Home />} />
-      <Route path='/signin' element={<Signin />} />
       <Route path='/signup' element={<Signup />} />
-      <Route path='/signup_otp' element={<SignupOtp />} />
+      <Route path="/signup_otp" element={<PrivateRoute />} />
+      <Route path='/login' element={<Signin />} />
       <Route path='/forgotpassword' element={<ForgotPassword />} />
-      <Route path='/otp' element={<OTP />} />
+      <Route path='/forgotpass_otp' element={<OTP />} />
     </Routes>
   )
 }

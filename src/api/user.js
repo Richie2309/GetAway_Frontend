@@ -15,4 +15,16 @@ const userRegister = async (fullName, email, password) => {
     }
 }
 
+export const otpVerify = async (otp) => {
+    try {
+        const response = await API.post(userRoutes.otpVerify, {
+            otp
+        })
+        return response
+    } catch (err) {
+        console.log("Error occured during otp verification", err);
+        throw err
+    }
+}
+
 export default userRegister

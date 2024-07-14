@@ -1,35 +1,56 @@
 import React, { useEffect, useRef, useState } from 'react'
 import signinform from '../../assets/SignPage.png'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import API from '../../services/axios'
 import userRoutes from '../../services/endpoints/userEndpoints';
 
 const SignupOtp = (props) => {
   const navigate = useNavigate()
+  const location = useLocation();
+  const { email } = location.state;
   const [timer, setTimer] = useState(120); // 120 seconds = 2 minutes
   const [isTimerExpired, setIsTimerExpired] = useState(false);
   const [isResendRequested, setIsResendRequested] = useState(false);
   const otpInputRef = useRef(null)
-
+  const [error, setError] = useState(null);
 
   const handleResendCode = () => {
-    setIsResendRequested(true);
-    API.post(userRoutes.resendSignupOtp, { email})
-    setTimer(120);
-    setIsTimerExpired(false);
-    // Clear OTP input field
-    otpInputRef.current.value = '';
+    if (!isResendRequested) {
+      setIsResendRequested(true);
+      setTimer(120); // Reset timer to 120 seconds
+      setIsTimerExpired(false);
+
+      API.post(userRoutes.otpResend, { email })
+        .then(response => {
+          // Clear OTP input field
+          if (otpInputRef.current) {
+            otpInputRef.current.value = '';
+          }
+        })
+        .catch(error => {
+          console.error('Error resending OTP:', error);
+        });
+    }
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = (e) => {
+    e.preventDefault()
     const otpValue = otpInputRef.current.value;
-    API.post(userRoutes.verifySignupOtp, { email, otp: otpValue })
+    if (!otpValue) {
+      setError('Please enter the OTP.');
+      return;
+    }
+    API.post(userRoutes.otpVerify, { email, otp: otpValue })
       .then(respose => {
         console.log(respose);
         navigate('/')
       })
       .catch(error => {
-        console.log(error); 
+        if (error.response && error.response.data && error.response.data.message) {
+          setError(error.response.data.message);
+        } else {
+          setError('Error verifying OTP. Please try again.');
+        }
       });
   };
 
@@ -53,7 +74,7 @@ const SignupOtp = (props) => {
   }, []);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-zinc-100 font-poppins">
+<div className="flex items-center justify-center min-h-screen bg-zinc-100 font-poppins">
       <div className="bg-white rounded-lg shadow-lg overflow-hidden flex w-3/4 max-w-4xl">
         <div className="w-1/2">
           <img
@@ -66,7 +87,6 @@ const SignupOtp = (props) => {
           <h2 className="text-3xl font-bold mb-6 text-center">Check your email</h2>
           <p>You should have an email from us
             with a code for creating a GetAway account.</p><br />
-          {/* <form className="space-y-4" onSubmit={handleFormSubmit}> */}
           <div>
             <label className="block text-sm font-medium text-zinc-700">
               Enter the code
@@ -76,9 +96,14 @@ const SignupOtp = (props) => {
               id="otp"
               ref={otpInputRef}
               className="mt-1 block w-full px-3 py-2 border border-zinc-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-              onChange={handleOtpInputChange}
               required />
           </div>
+
+          {error && (
+            <div className="text-red-600 mt-2 text-sm">
+              {error}
+            </div>
+          )}
 
           <div>
             <button
@@ -89,19 +114,20 @@ const SignupOtp = (props) => {
               Confirm
             </button>
           </div>
-          {/* </form> */}
+
           <div>
             <p className="mt-4 text-center text-sm text-zinc-600 flex justify-end">
               Did not arrive?
               <button
                 onClick={handleResendCode}
                 className={`flex items-center justify-center mx-1 text-blue-500 hover:underline ${!isTimerExpired ? "text-gray-400" : "text-blue-500"}`}
-                disabled={!isTimerExpired}
+                disabled={isResendRequested || isTimerExpired}
               >
                 Resend Code
               </button>
             </p>
           </div>
+          
           <div className="text-center mt-4 text-sm text-zinc-600">
             {!isTimerExpired ? (
               <p>Time remaining: {Math.floor(timer / 60)}:{timer % 60 < 10 ? `0${timer % 60}` : timer % 60}</p>

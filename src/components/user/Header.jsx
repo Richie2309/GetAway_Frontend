@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useRoutes } from 'react-router-dom';
 import getawayLogo from '../../assets/GetAway_logo.png';
+import API from '../../services/axios';
+import userRoutes from '../../services/endpoints/userEndpoints';
 
 const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [user, setUser] = useState(null)
   const dropdownRef = useRef(null);
 
   const toggleDropdown = () => {
@@ -22,6 +25,22 @@ const Header = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await API.get(userRoutes.getUser)
+        if (response.data && response.data.user) {
+          console.log('user data', response.data.user.fullName);
+          setUser(response.data.user.fullName);
+        }
+      } catch (err) {
+        console.error('Error fetching user data', err);
+        setUser(null);
+      }
+    }
+    fetchUser()
+  }, [])
 
   return (
     <header className="bg-white shadow-md font-poppins">
@@ -43,6 +62,9 @@ const Header = () => {
           </div>
         </div>
         <div className="flex items-center space-x-4 relative">
+          {user && (
+            <span className="text-gray-600 pr-10">{user}</span>
+          )}
           <button className="text-gray-600 hover:text-gray-900 pr-10">
             <svg width="39" height="32" viewBox="0 0 39 32" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M22.5699 22.72L27.2008 27.2M15.2008 9.60005C17.8517 9.60005 20.0008 11.7491 20.0008 14.4M25.7074 15.2534C25.7074 21.0266 21.0273 25.7067 15.2541 25.7067C9.4809 25.7067 4.80078 21.0266 4.80078 15.2534C4.80078 9.48016 9.4809 4.80005 15.2541 4.80005C21.0273 4.80005 25.7074 9.48016 25.7074 15.2534Z" stroke="black" stroke-width="2" stroke-linecap="round" />
@@ -56,8 +78,17 @@ const Header = () => {
             </button>
             {dropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-50">
-                <Link to="/signin" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Sign in</Link>
-                <Link to="/signup" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Sign up</Link>
+                {user ? (
+                  <>
+                    <span className="text-gray-600 pr-10">Logout</span>
+                    {/* <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100">Logout</button> */}
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Sign in</Link>
+                    <Link to="/signup" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">Sign up</Link>
+                  </>
+                )}
               </div>
             )}
           </div>
