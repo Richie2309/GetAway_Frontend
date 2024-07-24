@@ -1,23 +1,21 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState={
-    otpVerified:false,
-}
+const initialState = {
+    otpVerified: false,
+};
 
-const OtpSlice=createSlice({
-    name:"otpVerification",
+const OtpSlice = createSlice({
+    name: "otpVerification",
     initialState,
-
-    reducers:{
-        verified:(state,action)=>{
-            state.otpVerified=true
+    reducers: {
+        verified: (state) => {
+            state.otpVerified = true;
         },
-
-        unverified:(state,action)=>{
-            state.otpVerified=false
+        unverified: (state) => {
+            state.otpVerified = false;
         }
     }
-})
+});
 
-export const {verified,unverified}=OtpSlice.actions
-export default OtpSlice.reducer
+export const { verified, unverified } = OtpSlice.actions;
+export default OtpSlice.reducer;

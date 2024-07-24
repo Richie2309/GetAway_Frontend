@@ -38,9 +38,9 @@ const SearchandSet = () => {
             <button className='mx-2'>
                 <svg width="45" height="45" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect width="60" height="60" rx="30" fill="#FF385C" />
-                    <path d="M40.725 40.725L36.6 36.6" stroke="white" stroke-width="1.98" stroke-miterlimit="10" stroke-linecap="square" />
-                    <path d="M21.75 27.525C21.75 25.9934 22.3584 24.5245 23.4415 23.4415C24.5245 22.3584 25.9934 21.75 27.525 21.75" stroke="white" stroke-width="1.98" stroke-miterlimit="10" />
-                    <path d="M27.525 36.6C32.537 36.6 36.6 32.537 36.6 27.525C36.6 22.513 32.537 18.45 27.525 18.45C22.513 18.45 18.45 22.513 18.45 27.525C18.45 32.537 22.513 36.6 27.525 36.6Z" stroke="white" stroke-width="1.98" stroke-miterlimit="10" stroke-linecap="square" />
+                    <path d="M40.725 40.725L36.6 36.6" stroke="white" strokeWidth="1.98" strokeMiterlimit="10" strokeLinecap="square" />
+                    <path d="M21.75 27.525C21.75 25.9934 22.3584 24.5245 23.4415 23.4415C24.5245 22.3584 25.9934 21.75 27.525 21.75" stroke="white" strokeWidth="1.98" strokeMiterlimit="10" />
+                    <path d="M27.525 36.6C32.537 36.6 36.6 32.537 36.6 27.525C36.6 22.513 32.537 18.45 27.525 18.45C22.513 18.45 18.45 22.513 18.45 27.525C18.45 32.537 22.513 36.6 27.525 36.6Z" stroke="white" strokeWidth="1.98" strokeMiterlimit="10" strokeLinecap="square" />
                 </svg>
             </button>
         </div>

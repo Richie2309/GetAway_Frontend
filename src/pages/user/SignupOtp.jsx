@@ -7,7 +7,8 @@ import userRoutes from '../../services/endpoints/userEndpoints';
 const SignupOtp = (props) => {
   const navigate = useNavigate()
   const location = useLocation();
-  const { email } = location.state;
+  const state = location.state;
+  const email = state;
   const [timer, setTimer] = useState(120); // 120 seconds = 2 minutes
   const [isTimerExpired, setIsTimerExpired] = useState(false);
   const [isResendRequested, setIsResendRequested] = useState(false);
@@ -43,7 +44,7 @@ const SignupOtp = (props) => {
     API.post(userRoutes.otpVerify, { email, otp: otpValue })
       .then(respose => {
         console.log(respose);
-        navigate('/')
+        navigate('/login')
       })
       .catch(error => {
         if (error.response && error.response.data && error.response.data.message) {
@@ -74,19 +75,18 @@ const SignupOtp = (props) => {
   }, []);
 
   return (
-<div className="flex items-center justify-center min-h-screen bg-zinc-100 font-poppins">
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden flex w-3/4 max-w-4xl">
-        <div className="w-1/2">
+    <div className="flex items-center justify-center min-h-screen bg-zinc-100 font-poppins p-4">
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col md:flex-row w-full md:w-3/4 max-w-4xl">
+        <div className="w-full md:w-1/2 h-48 md:h-auto">
           <img
             src={signinform}
             alt="Beautiful beach view"
             className="w-full h-full object-cover"
           />
         </div>
-        <div className="w-1/2 p-8">
-          <h2 className="text-3xl font-bold mb-6 text-center">Check your email</h2>
-          <p>You should have an email from us
-            with a code for creating a GetAway account.</p><br />
+        <div className="w-full md:w-1/2 p-6 md:p-8">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-center">Check your email</h2>
+          <p className="text-sm md:text-base mb-4">You should have an email from us with a code for creating a GetAway account.</p>
           <div>
             <label className="block text-sm font-medium text-zinc-700">
               Enter the code
@@ -96,7 +96,8 @@ const SignupOtp = (props) => {
               id="otp"
               ref={otpInputRef}
               className="mt-1 block w-full px-3 py-2 border border-zinc-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-              required />
+              required
+            />
           </div>
 
           {error && (
@@ -108,27 +109,25 @@ const SignupOtp = (props) => {
           <div>
             <button
               onClick={handleConfirm}
-              className="flex w-full items-center justify-center rounded-[20px] bg-red-600/50 px-12 py-[8.9px] mt-3"
+              className="flex w-full items-center justify-center rounded-[20px] bg-red-600/50 px-4 py-2 md:px-12 md:py-[8.9px] mt-4 text-sm md:text-base"
               disabled={isTimerExpired}
             >
               Confirm
             </button>
           </div>
 
-          <div>
-            <p className="mt-4 text-center text-sm text-zinc-600 flex justify-end">
-              Did not arrive?
-              <button
-                onClick={handleResendCode}
-                className={`flex items-center justify-center mx-1 text-blue-500 hover:underline ${!isTimerExpired ? "text-gray-400" : "text-blue-500"}`}
-                disabled={isResendRequested || isTimerExpired}
-              >
-                Resend Code
-              </button>
-            </p>
+          <div className="mt-4 text-center text-sm md:text-base text-zinc-600 flex flex-col md:flex-row md:justify-end items-center">
+            <p>Did not arrive?</p>
+            <button
+              onClick={handleResendCode}
+              className={`ml-2 text-blue-500 hover:underline ${!isTimerExpired ? "text-gray-400" : "text-blue-500"}`}
+              disabled={isResendRequested || isTimerExpired}
+            >
+              Resend Code
+            </button>
           </div>
-          
-          <div className="text-center mt-4 text-sm text-zinc-600">
+
+          <div className="text-center mt-4 text-sm md:text-base text-zinc-600">
             {!isTimerExpired ? (
               <p>Time remaining: {Math.floor(timer / 60)}:{timer % 60 < 10 ? `0${timer % 60}` : timer % 60}</p>
             ) : (
