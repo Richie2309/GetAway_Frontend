@@ -4,12 +4,9 @@ import DashboardContent from '../../components/admin/DashboardContent'
 
 const Dashboard = () => {
   return (
-    <div className="flex min-h-screen">
-      <SidePanel />
-      <div className="flex-grow">
-        <DashboardContent />
-      </div>
-    </div>
+
+    <DashboardContent />
+
   )
 }
 

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import ProfileSidebar from '../../components/user/ProfileSidebar';
 import { IoCloudUploadOutline } from 'react-icons/io5';
-import { getUserData } from '../../api/user';
+import { getUserData, updateBankAccount, updateIdentity, updatePassword, updateProfile } from '../../api/user';
 
 const Account = () => {
 
+  const [loading, setLoading] = useState(false)
   // State for profile information
   const [profile, setProfile] = useState({
     fullName: '',
@@ -31,12 +32,10 @@ const Account = () => {
   });
 
   // State for identity verification
-  const [identity, setIdentity] = useState({
-    link: ''
-  });
+  const [identityImages, setIdentityImages] = useState([]);
 
   // State for identity errors
-  // const [identityError, setIdentityError] = useState('');
+  const [identityError, setIdentityError] = useState('');
 
   // State for bank account information
   const [bankAccount, setBankAccount] = useState({
@@ -55,7 +54,7 @@ const Account = () => {
       try {
         const response = await getUserData();
         const userData = response.data.user;
-
+        console.log(userData);
         setProfile({
           fullName: userData.fullName,
           email: userData.email,
@@ -66,6 +65,9 @@ const Account = () => {
           accountNumber: userData.bank_account_number || '',
           ifscCode: userData.ifsc_code || ''
         });
+
+        setIdentityImages(userData.id_proof || []);
+
       } catch (err) {
         console.log('Error getting user data:', err);
       }
@@ -110,16 +112,18 @@ const Account = () => {
     return isValid;
   };
 
-  // const validateIdentity = () => {
-  //   let isValid = true;
-  //   if (identity.link && !/^https?:\/\/[^\s]+$/.test(identity.link)) {
-  //     setIdentityError('Please enter a valid URL');
-  //     isValid = false;
-  //   } else {
-  //     setIdentityError('');
-  //   }
-  //   return isValid;
-  // };
+  const validateIdentity = () => {
+    let isValid = true;
+    let error = '';
+
+    if (identityImages.length === 0) {
+      error = 'Please upload your identity document.';
+      isValid = false;
+    }
+
+    setIdentityError(error);
+    return isValid;
+  };
 
   const validateBankAccount = () => {
     let isValid = true;
@@ -139,38 +143,97 @@ const Account = () => {
     return isValid;
   };
 
-  const handleProfileSubmit = (e) => {
-    e.preventDefault();
-    // Handle profile information submission
-    console.log('Profile updated:', profile);
-  };
-
-  const handlePasswordChange = (e) => {
-    e.preventDefault();
-    if (passwords.newPassword === passwords.confirmPassword) {
-      // Handle password change
-      console.log('Password changed');
-    } else {
-      console.log('Passwords do not match');
+  const handleProfileSubmit = async (e) => {
+    e.preventDefault()
+    if (validateProfile()) {
+      try {
+        await updateProfile(profile);
+        console.log('Profile updated successfully');
+      } catch (err) {
+        console.log('Error updating profile:', err);
+      }
     }
   };
 
-  const handleIdentityVerification = (e) => {
+  const handlePasswordChange = async (e) => {
     e.preventDefault();
-    // Handle identity verification
-    console.log('Identity link:', identity.link);
+    if (validatePasswords()) {
+      try {
+        await updatePassword(passwords.newPassword);
+        console.log('Password changed successfully');
+      } catch (error) {
+        console.log('Error changing password:', error);
+      }
+    }
   };
 
-  const handleBankAccountAddition = (e) => {
-    e.preventDefault();
-    // Handle bank account addition
-    console.log('Bank account added:', bankAccount);
+  const handleIdentityVerification = async (e) => {
+    e.preventDefault()
+    if (validateIdentity()) {
+      try {
+        const res=await updateIdentity(identityImages);
+        console.log('Identity verification successful',res);
+        setIdentityError('');
+      } catch (error) {
+        console.log('Error verifying identity:', error);
+        setIdentityError('Failed to verify identity. Please try again.');
+      }
+    }
   };
+
+  const handleIdentityImageUpload = async (e) => {
+    const files = e.target.files;
+  
+    if (!files || files.length === 0) return;
+  
+    if (identityImages.length + files.length > 2) {
+      setIdentityError('You can upload a maximum of 2 images.');
+      return;
+    }
+  
+    const newImages = [];
+  
+    for (const file of files) {
+      try {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64String = reader.result;
+          newImages.push(base64String);
+  
+          // Check if all files have been processed
+          if (newImages.length === files.length) {
+            const updatedImages = [...identityImages, ...newImages];
+            setIdentityImages(updatedImages);
+            setIdentityError('');          
+          }
+        };
+        reader.readAsDataURL(file);
+        const response=await updateIdentity(identityImages);
+        console.log("identi",response);
+      } catch (error) {
+        console.log('Error uploading identity image:', error);
+        setIdentityError('Failed to upload image. Please try again.');
+      }
+    }
+  };
+  
+  const handleBankAccountAddition = async (e) => {
+    e.preventDefault();
+    if (validateBankAccount()) {
+      try {
+        await updateBankAccount(bankAccount);
+        console.log('Bank account added successfully');
+      } catch (error) {
+        console.log('Error adding bank account:', error);
+      }
+    }
+  };
+
+
 
   return (
     <>
-      <div className="container mx-auto flex font-poppins mt-10 mb-10">
-        <ProfileSidebar />
+      <div className="container mx-auto flex font-poppins mb-10">
         <div className="flex-1 flex justify-center">
           <main className="bg-card shadow max-w-3xl w-full">
             <h1 className="text-2xl font-bold mb-6">Your Account</h1>
@@ -206,7 +269,7 @@ const Account = () => {
                 />
                 {profileErrors.phone && <p className="text-red-500 text-sm">{profileErrors.phone}</p>}
               </div>
-              <button type="submit" className="flex w-full items-center justify-center rounded-[20px] bg-red-600/50 px-4 py-2 md:px-44 md:py-[8.9px]">Save</button>
+              <button type="submit" className="w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 mb-11">Save</button>
             </form>
 
             {/* Password Change Form */}
@@ -236,31 +299,41 @@ const Account = () => {
                 Password requirements:
                 <br />• At least 8 characters long <br />• Contains letters, at least one digit, and a symbol
               </p>
-              <button type="submit" className="flex w-full items-center justify-center rounded-[20px] bg-red-600/50 px-4 py-2 md:px-44 md:py-[8.9px]">Change</button>
+              <button type="submit" className="w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 mb-11">Change</button>
             </form>
 
             {/* Identity Verification Form */}
             <form onSubmit={handleIdentityVerification} className="space-y-6 mt-10">
               <h2 className="text-xl font-semibold mb-2">Verify your identity</h2>
               <span>Upload your Passport/Driver's license/Identity card</span>
-              <div className='flex gap-2'>
-                <input
-                  type="text"
-                  className='w-full border p-2 rounded shadow-slate-400 shadow-sm'
-                  placeholder={'Add using a link'}
-                  value={identity.link}
-                  onChange={(e) => setIdentity({ ...identity, link: e.target.value })}
-                />
-                <button className='bg-gray-200 px-4 rounded-2xl'>Add&nbsp;photo</button>
+              <div className="w-1/2 flex justify-center border-2 border-gray-200 rounded-2xl py-4">
+                <div className="space-y-1 text-center">
+                  <IoCloudUploadOutline className="mx-auto h-12 w-12 text-gray-400" />
+                  <div className="flex text-sm text-gray-600">
+                    <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                      <span>Upload</span>
+                      <input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleIdentityImageUpload} accept='image/*' multiple/>
+                    </label>
+                  </div>
+                </div>
               </div>
-              <div className="mt-2 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-                <button className='border bg-transparent rounded-2xl p-4 text-gray-600 flex items-center'>
-                  <IoCloudUploadOutline style={{ fontSize: '24px', marginRight: '8px' }} />
-                  Upload
-                </button>
+
+              {identityError && <p className="text-red-500 text-sm">{identityError}</p>}
+              {/* Display uploaded images */}
+              <div className="mt-4 flex flex-wrap gap-4">
+                {identityImages && identityImages.length > 0 && identityImages.map((imageUrl, index) => (
+                  imageUrl && (
+                    <img
+                      key={index}
+                      src={imageUrl}
+                      alt={`Identity document ${index + 1}`}
+                      className="w-32 h-32 object-cover rounded-md"
+                    />
+                  )
+                ))}
               </div>
               <p className="text-primary text-sm mt-2">Your ID will be handled according to our <a href="#" className="text-accent">Privacy Policy</a> and won't be shared with your Host or guests.</p>
-              <button type="submit" className="flex w-full items-center justify-center rounded-[20px] bg-red-600/50 px-4 py-2 md:px-44 md:py-[8.9px]">Save</button>
+              <button type="submit" className="w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 mb-11">Save</button>
             </form>
 
             {/* Bank Account Form */}
@@ -286,7 +359,7 @@ const Account = () => {
                 />
                 {bankAccountErrors.ifscCode && <p className="text-red-500 text-sm">{bankAccountErrors.ifscCode}</p>}
               </div>
-              <button type="submit" className="flex w-full items-center justify-center rounded-[20px] bg-red-600/50 px-4 py-2 md:px-44 md:py-[8.9px]">Save</button>
+              <button type="submit" className="w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 mb-11">Save</button>
             </form>
           </main>
         </div>

@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import getawayLogo from '../../assets/GetAway_logo.png';
 import API from '../../services/axios';
 import userRoutes from '../../services/endpoints/userEndpoints';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../redux/slice/userAuthSlice';
+import { toast } from 'react-toastify';
 
 const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [user, setUser] = useState(null)
   const dropdownRef = useRef(null);
   const dispatch = useDispatch();
+  const navigate=useNavigate()
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
@@ -46,7 +48,12 @@ const Header = () => {
     const fetchUser = async () => {
       try {
         const response = await API.get(userRoutes.getUser)
-        if (response.data && response.data.user) {
+        if (response.data.user.is_blocked) {
+          toast.error('This account is blocked.'); // Show toast
+          dispatch(logout());
+          setUser(null);
+          navigate('/login'); // Redirect to login page
+        } else if (response.data && response.data.user) {
           setUser(response.data.user.fullName);
         }
       } catch (err) {

@@ -1,4 +1,3 @@
-
 const userRoutes = {
     register: '/api/register',
     otpVerify: '/api/otpVerify',
@@ -10,7 +9,10 @@ const userRoutes = {
     updateProfile:'/api/updateProfile',
     updatePassword:'/api/updatePassword',
     updateIdentity:'/api/updateIdentity',
-    updateBankAccount:'/api/updateBankAccount'
+    updateBankAccount:'/api/updateBankAccount',
+    addHotel:'/api/addHotel',
+    getHotelData:'/api/getHotel/:hotelId',
+    updateHotel:'/api/updateHotel'
     // verifyForgotPasswordOtp: '/api/verify-forgot-password-otp',
     // resendForgotPasswordOtp: '/api/resend-forgot-password-otp',
 }

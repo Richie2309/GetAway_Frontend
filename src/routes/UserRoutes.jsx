@@ -20,7 +20,6 @@ const UserRoutes = () => {
       {!isLoggedIn ? (
         <>
           <Route path='/signup' element={<Signup />} />
-          <Route path='/signup/otp' element={<SignupOtp />} />
           <Route path='/login' element={<Signin />} />
           <Route path='/forgotpassword' element={<ForgotPassword />} />
           <Route path='/forgotpass_otp' element={<OTP />} />

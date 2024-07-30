@@ -7,3 +7,4 @@ export const PrivateRoute = () => {
 
     return isAuthenticated ? <Outlet /> : <Navigate to="/admin/login" />;
 };
+ 
