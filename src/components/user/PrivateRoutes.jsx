@@ -27,7 +27,7 @@ const PrivateRoutes = () => {
         <Route path="account" element={<Account />} />
         <Route path="bookings" element={<MyBookings />} />
         <Route path="accommodations" element={<MyAccommodations />} />
-        <Route path="accommodations/add-hotel" element={<AddHotel />} />
+        <Route path="accommodations/add-hotel/:hotelId?" element={<AddHotel />} />
         <Route path="revenue" element={<Account />} />
       </Route>
     </Routes>

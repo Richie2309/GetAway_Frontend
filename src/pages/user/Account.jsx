@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react';
 import ProfileSidebar from '../../components/user/ProfileSidebar';
 import { IoCloudUploadOutline } from 'react-icons/io5';
 import { getUserData, updateBankAccount, updateIdentity, updatePassword, updateProfile } from '../../api/user';
+import { message } from 'antd';
+import { useDispatch } from 'react-redux';
+import { updateName } from '../../redux/slice/userAuthSlice';
+
 
 const Account = () => {
-
-  const [loading, setLoading] = useState(false)
+  const dispatch=useDispatch()
   // State for profile information
   const [profile, setProfile] = useState({
     fullName: '',
@@ -148,9 +151,11 @@ const Account = () => {
     if (validateProfile()) {
       try {
         await updateProfile(profile);
-        console.log('Profile updated successfully');
+        message.success('Profile updated successfully');
+        dispatch(updateName(profile.fullName))
       } catch (err) {
         console.log('Error updating profile:', err);
+        message.error('Failed to update profile');
       }
     }
   };
@@ -160,9 +165,11 @@ const Account = () => {
     if (validatePasswords()) {
       try {
         await updatePassword(passwords.newPassword);
+        message.success('Password changed successfully');
         console.log('Password changed successfully');
       } catch (error) {
         console.log('Error changing password:', error);
+        message.error('Failed to change password');
       }
     }
   };
@@ -171,11 +178,12 @@ const Account = () => {
     e.preventDefault()
     if (validateIdentity()) {
       try {
-        const res=await updateIdentity(identityImages);
-        console.log('Identity verification successful',res);
+        await updateIdentity(identityImages);
+        message.success('Identity verification successful');
         setIdentityError('');
       } catch (error) {
         console.log('Error verifying identity:', error);
+        message.error('Failed to verify identity. Please try again.');
         setIdentityError('Failed to verify identity. Please try again.');
       }
     }
@@ -183,48 +191,50 @@ const Account = () => {
 
   const handleIdentityImageUpload = async (e) => {
     const files = e.target.files;
-  
+
     if (!files || files.length === 0) return;
-  
+
     if (identityImages.length + files.length > 2) {
       setIdentityError('You can upload a maximum of 2 images.');
       return;
     }
-  
+
     const newImages = [];
-  
+
     for (const file of files) {
       try {
         const reader = new FileReader();
         reader.onloadend = () => {
           const base64String = reader.result;
           newImages.push(base64String);
-  
+
           // Check if all files have been processed
           if (newImages.length === files.length) {
             const updatedImages = [...identityImages, ...newImages];
             setIdentityImages(updatedImages);
-            setIdentityError('');          
+            setIdentityError('');
           }
         };
         reader.readAsDataURL(file);
-        const response=await updateIdentity(identityImages);
-        console.log("identi",response);
+        await updateIdentity(identityImages);
+        message.success('Identity images uploaded successfully');
       } catch (error) {
         console.log('Error uploading identity image:', error);
         setIdentityError('Failed to upload image. Please try again.');
+        message.error('Failed to upload image. Please try again.');
       }
     }
   };
-  
+
   const handleBankAccountAddition = async (e) => {
     e.preventDefault();
     if (validateBankAccount()) {
       try {
         await updateBankAccount(bankAccount);
-        console.log('Bank account added successfully');
+        message.success('Bank account added successfully');
       } catch (error) {
         console.log('Error adding bank account:', error);
+        message.error('Failed to add bank account');
       }
     }
   };
@@ -234,7 +244,7 @@ const Account = () => {
   return (
     <>
       <div className="container mx-auto flex font-poppins mb-10">
-        <div className="flex-1 flex justify-center">
+        <div className="flex-1 flex justify-center mb-10">
           <main className="bg-card shadow max-w-3xl w-full">
             <h1 className="text-2xl font-bold mb-6">Your Account</h1>
 
@@ -312,7 +322,7 @@ const Account = () => {
                   <div className="flex text-sm text-gray-600">
                     <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
                       <span>Upload</span>
-                      <input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleIdentityImageUpload} accept='image/*' multiple/>
+                      <input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleIdentityImageUpload} accept='image/*' multiple />
                     </label>
                   </div>
                 </div>
@@ -359,7 +369,7 @@ const Account = () => {
                 />
                 {bankAccountErrors.ifscCode && <p className="text-red-500 text-sm">{bankAccountErrors.ifscCode}</p>}
               </div>
-              <button type="submit" className="w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 mb-11">Save</button>
+              <button type="submit" className="w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">Save</button>
             </form>
           </main>
         </div>

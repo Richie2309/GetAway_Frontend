@@ -27,6 +27,16 @@ export const otpVerify = async (otp) => {
   }
 }
 
+export const otpResend = async (email) => {
+  try {
+    const response = await API.post(userRoutes.otpVerify, { email })
+    return response
+  } catch (err) {
+    console.log("Error occured during otp verification", err);
+    throw err
+  }
+}
+
 export const googleLogin = async (name, email) => {
   try {
     const response = await API.post(userRoutes.googAuth, { name, email });
@@ -43,6 +53,37 @@ export const getUserData = async () => {
     return response
   } catch (err) {
     console.log('Error getting user data');
+    throw err
+  }
+}
+
+export const checkMail = async (email) => {
+  try {
+    const response = await API.get(`${userRoutes.checkMail}?email=${email}`)
+    return response
+  } catch (err) {
+    console.log('Error getting details');
+    throw err
+  }
+}
+
+
+export const verifyForgotPasswordOtp = async (email, otp) => {
+  try {
+    const response = await API.post(userRoutes.verifyForgotPasswordOtp, { email, otp });
+    return response
+  } catch (err) {
+    console.log("Error occured during otp verification", err);
+    throw err
+  }
+};
+
+export const resetPassword = async (email, password) => {
+  try {
+    const response = await API.patch(userRoutes.resetPassword, { email, password })
+    return response
+  } catch (err) {
+    console.log("Error occured during otp verification", err);
     throw err
   }
 }
@@ -89,7 +130,6 @@ export const updateBankAccount = async (bankAccount) => {
 
 export const addHotel = async (hotelData) => {
   try {
-    console.log('hotel data in users',hotelData);
     const response = await API.post(userRoutes.addHotel, hotelData);
     return response;
   } catch (err) {
@@ -98,9 +138,19 @@ export const addHotel = async (hotelData) => {
   }
 };
 
-export const getHotelData=async (hotelId)=>{
+export const getMyHotels = async () => {
   try {
-    const response=await API.get(`${userRoutes.getHotelData}/${hotelId}`)
+    const response = await API.get(userRoutes.getMyHotels)
+    return response
+  } catch (err) {
+    console.log("Error occurred while getting hotels", err);
+    throw err;
+  }
+}
+
+export const getHotelData = async (hotelId) => {
+  try {
+    const response = await API.get(`${userRoutes.getHotelData}/${hotelId}`)
     return response
   } catch (err) {
     console.log("Error occurred while fetching hotel details", err);
@@ -109,13 +159,41 @@ export const getHotelData=async (hotelId)=>{
 }
 
 export const editHotel = async (hotelData) => {
+  console.log('hoteldata id in userjs', hotelData);
   try {
-    const response = await API.put(userRoutes.editHotel, hotelData);
+    const response = await API.put(userRoutes.updateHotel, hotelData);
     return response;
   } catch (err) {
     console.log("Error occurred while editing hotel", err);
     throw err;
   }
 };
+
+export const getAllHotels = async (searchData) => {
+  try {
+    console.log('searchdata', searchData);
+
+    const response = await API.get(userRoutes.getAllHotels, { params: searchData })
+    return response
+  } catch (err) {
+    console.log('Error occured while getting hotel informations');
+    throw err
+  }
+}
+
+// export const searchHotel = async (searchParams) => {
+//   try {
+//     const queryString = new URLSearchParams(searchParams).toString()
+//     console.log('query',queryString);
+
+//     const response = await API.get(`${userRoutes.searchHotel}?${queryString}`)
+//     console.log('resos',response);
+
+//     return response
+//   } catch (err) {
+//     console.log('Error occured while getting hotel informations');
+//     throw err
+//   }
+// }
 
 export default userRegister

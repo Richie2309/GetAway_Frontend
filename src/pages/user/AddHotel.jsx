@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { FaCloudUploadAlt, FaWifi, FaParking, FaTv, FaSnowflake } from 'react-icons/fa';
 import { addHotel, editHotel, getHotelData, getUserData } from '../../api/user';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { message } from 'antd';
 
 const AddHotel = () => {
+  const [titleCharCount, setTitleCharCount] = useState(0);
+  const [descriptionCharCount, setDescriptionCharCount] = useState(0);
   const location = useLocation();
-  const isEdit = location.pathname.includes('edit-hotel');
-  const hotelId = new URLSearchParams(location.search).get('id');
-  const [hotelData, setHotelData] = useState(null);
+  const { hotelId } = useParams();
+  const navigate = useNavigate();
+  const isEdit = !!hotelId;
 
   const [formData, setFormData] = useState({
     title: '',
@@ -21,10 +24,7 @@ const AddHotel = () => {
     bathrooms: '',
     bedrooms: '',
     beds: '',
-    wifi: false,
-    parking: false,
-    tv: false,
-    ac: false,
+    perks: [],
     checkInTime: '',
     checkOutTime: '',
     price_per_night: '',
@@ -36,6 +36,12 @@ const AddHotel = () => {
   const [earnings, setEarnings] = useState(0);
   const [userData, setUserData] = useState({});
   const [infoIncomplete, setInfoIncomplete] = useState(false);
+
+  //Count the characters for title and description
+  useEffect(() => {
+    setTitleCharCount(formData.title.length);
+    setDescriptionCharCount(formData.description.length);
+  }, [formData.title, formData.description]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -49,7 +55,6 @@ const AddHotel = () => {
         } else {
           setInfoIncomplete(false);
         }
-        console.log(userData)
       } catch (err) {
         console.log('Error getting user data:', err);
       }
@@ -60,10 +65,11 @@ const AddHotel = () => {
 
   useEffect(() => {
     const fetchHotelData = async () => {
-      if (isEdit && hotelId) {
+      if (isEdit) {
         try {
           const response = await getHotelData(hotelId);
-          const fetchedHotelData = response.data;
+          console.log('hellhho', response.data);
+          const fetchedHotelData = response.data.hotel;
           setFormData(prevState => ({
             ...prevState,
             ...fetchedHotelData,
@@ -76,7 +82,6 @@ const AddHotel = () => {
 
     fetchHotelData();
   }, [isEdit, hotelId]);
-
 
   useEffect(() => {
     if (formData.price_per_night) {
@@ -128,10 +133,19 @@ const AddHotel = () => {
     const { name, value, type, checked } = e.target;
     const newValue = type === 'checkbox' ? checked : value;
 
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: newValue
-    }));
+    if (type === 'checkbox') {
+      setFormData(prevState => ({
+        ...prevState,
+        perks: checked
+          ? [...prevState.perks, name]
+          : prevState.perks.filter(perk => perk !== name)
+      }));
+    } else {
+      setFormData(prevState => ({
+        ...prevState,
+        [name]: newValue
+      }));
+    }
 
     // Clear the error for this field as the user types
     if (errors[name]) {
@@ -198,25 +212,21 @@ const AddHotel = () => {
 
     if (isFormValid && arePhotosValid) {
       try {
-        //         const formDataToSend = new FormData();
-        //         // Object.keys(formData).forEach(key => formDataToSend.append(key, formData[key]));
-
-        // console.log(formData);
-        // console.log(formDataToSend);
         if (isEdit) {
-          await editHotel({ ...formData, id: hotelId });
+          console.log('form data inn', formData);
+          await editHotel({ ...formData }); message.success('Your accommodation details are updated successfully');
         } else {
           await addHotel(formData);
+          message.success('Your accommodation details are submitted successfully');
         }
-        // Handle success (e.g., show a success message or redirect)
-
+        navigate('/profile/accommodations')
       } catch (err) {
-        // Handle error (e.g., show an error message)
-
         console.log('Error submitting form:', err);
+        message.error('Failed to submit accommodation details. Please try again.');
       }
     } else {
       console.log("Form has errors.");
+      message.error('Please correct the errors in the form before submitting.');
     }
   };
 
@@ -224,7 +234,7 @@ const AddHotel = () => {
   return (
     <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md font-poppins">
       <h1 className="text-2xl font-bold mb-6">My Accommodations</h1>
-      <h2 className="text-xl font-semibold mb-4">Add your place</h2>
+      <h2 className="text-xl font-semibold mb-4">{isEdit ? 'Edit your place' : 'Add your place'}</h2>
       <div>
         <h6>Phone Number : {userData.phone ? 'Added✅' : 'Not added❌'}</h6>
         <h6>Bank Account : {userData.bank_account_number && userData.ifsc_code ? 'Added✅' : 'Not added❌'}</h6>
@@ -245,6 +255,7 @@ const AddHotel = () => {
             placeholder="Add title for your place"
           />
           {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
+          <p className="text-sm text-gray-400 mt-2">{titleCharCount} / 32 characters</p>
         </div>
 
         <span className='text-xl font-semibold'>Address</span>
@@ -325,6 +336,7 @@ const AddHotel = () => {
             </div>
           </div>
           {imageError && <p className="text-red-500 text-sm">{imageError}</p>}
+
           {/* Display uploaded photos */}
           <div className="mt-4 flex flex-wrap gap-4">
             {formData.photos.map((imageUrl, index) => (
@@ -349,6 +361,7 @@ const AddHotel = () => {
             className={`w-full border p-2 rounded shadow-slate-400 shadow-sm ${errors.description ? 'border-red-500' : ''}`}
           ></textarea>
           {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
+          <p className="text-sm text-gray-400 mt-2">{descriptionCharCount} / 400 characters</p>
         </div>
 
         <div className="mb-10 grid grid-cols-2 gap-4">
@@ -403,21 +416,22 @@ const AddHotel = () => {
 
         <div className="mb-10">
           <span className='text-xl font-semibold'>Perks</span>
-          <p className='mb-2'>Select all the perks of your place</p>          <div className="mt-2 flex space-x-4">
+          <p className='mb-2'>Select all the perks of your place</p>
+          <div className="mt-2 flex space-x-4">
             <label className="w-11/12 inline-flex items-center border p-2 rounded shadow-slate-400 shadow-sm">
-              <input type="checkbox" name="wifi" checked={formData.wifi} onChange={handleChange} className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+              <input type="checkbox" name="Wifi" checked={formData.perks.includes('Wifi')} onChange={handleChange} className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
               <span className="ml-2"><FaWifi /> WiFi</span>
             </label>
             <label className="w-11/12 inline-flex items-center border p-2 rounded shadow-slate-400 shadow-sm">
-              <input type="checkbox" name="parking" checked={formData.parking} onChange={handleChange} className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+              <input type="checkbox" name="Parking" checked={formData.perks.includes('Parking')} onChange={handleChange} className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
               <span className="ml-2"><FaParking /> Parking</span>
             </label>
             <label className="w-11/12 inline-flex items-center border p-2 rounded shadow-slate-400 shadow-sm">
-              <input type="checkbox" name="tv" checked={formData.tv} onChange={handleChange} className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+              <input type="checkbox" name="TV" checked={formData.perks.includes('TV')} onChange={handleChange} className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
               <span className="ml-2"><FaTv /> TV</span>
             </label>
             <label className="w-11/12 inline-flex items-center border p-2 rounded shadow-slate-400 shadow-sm">
-              <input type="checkbox" name="ac" checked={formData.ac} onChange={handleChange} className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+              <input type="checkbox" name="AC" checked={formData.perks.includes('AC')} onChange={handleChange} className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
               <span className="ml-2"><FaSnowflake /> AC</span>
             </label>
           </div>

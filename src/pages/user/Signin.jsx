@@ -11,7 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import { googleLogin } from '../../api/user';
-import { login } from '../../redux/slice/userAuthSlice';
+import { login, userData } from '../../redux/slice/userAuthSlice';
 import SignupOtp from './SignupOtp';
 
 
@@ -32,6 +32,7 @@ const Signin = () => {
       console.log('response.data', response.data);
       if (response.data.message == 'Successfuly login') {
         dispatch(login())
+        dispatch(userData(response.data.userData))
         navigate('/')
       } else {
         setGotoOtp(true)

@@ -16,6 +16,7 @@ const SignupOtp = (props) => {
   const [error, setError] = useState(null);
 
   const handleResendCode = () => {
+
     if (!isResendRequested) {
       setIsResendRequested(true);
       setTimer(120); // Reset timer to 120 seconds

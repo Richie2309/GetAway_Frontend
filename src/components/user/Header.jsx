@@ -3,16 +3,17 @@ import { Link, useNavigate } from 'react-router-dom';
 import getawayLogo from '../../assets/GetAway_logo.png';
 import API from '../../services/axios';
 import userRoutes from '../../services/endpoints/userEndpoints';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../redux/slice/userAuthSlice';
-import { toast } from 'react-toastify';
+import { message } from 'antd';
 
 const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [user, setUser] = useState(null)
   const dropdownRef = useRef(null);
   const dispatch = useDispatch();
-  const navigate=useNavigate()
+  const navigate = useNavigate()
+  const userData = useSelector((state) => state.userAuth.userData)
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
@@ -30,7 +31,7 @@ const Header = () => {
       if (response.status === 200) {
         setUser(null);
         dispatch(logout())
-        window.location.href = '/'; // Redirect to home page or login page
+        window.location.href = '/'; 
       }
     } catch (err) {
       console.error('Error logging out', err);
@@ -49,10 +50,10 @@ const Header = () => {
       try {
         const response = await API.get(userRoutes.getUser)
         if (response.data.user.is_blocked) {
-          toast.error('This account is blocked.'); // Show toast
           dispatch(logout());
+          message.error('This account is blocked')
           setUser(null);
-          navigate('/login'); // Redirect to login page
+          navigate('/login');
         } else if (response.data && response.data.user) {
           setUser(response.data.user.fullName);
         }
@@ -66,7 +67,6 @@ const Header = () => {
 
   return (
     <>
-
       <header className="bg-white shadow-md font-poppins">
         <div className="container mx-auto px-4 flex justify-between items-center py-4">
           <div>
@@ -87,7 +87,7 @@ const Header = () => {
           </div>
           <div className="flex items-center space-x-4 relative">
             {user && (
-              <span className="text-gray-600 pr-10">{user}</span>
+              <span className="text-gray-600 pr-10">{userData.fullName }</span>
             )}
             <button className="text-gray-600 hover:text-gray-900 pr-10">
               <svg width="39" height="32" viewBox="0 0 39 32" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -6,15 +6,18 @@ const userRoutes = {
     getUser: '/api/getUser',
     logout: '/api/logout',
     googAuth:'/api/googleAuth',
+    checkMail:'/api/checkMail',
+    verifyForgotPasswordOtp:'/api/verifyForgotPasswordOtp',
+    resetPassword:'/api/resetPassword',
     updateProfile:'/api/updateProfile',
     updatePassword:'/api/updatePassword',
     updateIdentity:'/api/updateIdentity',
     updateBankAccount:'/api/updateBankAccount',
     addHotel:'/api/addHotel',
-    getHotelData:'/api/getHotel/:hotelId',
-    updateHotel:'/api/updateHotel'
-    // verifyForgotPasswordOtp: '/api/verify-forgot-password-otp',
-    // resendForgotPasswordOtp: '/api/resend-forgot-password-otp',
+    getMyHotels:'/api/getMyHotels',
+    getHotelData: '/api/getHotel',
+    updateHotel:'/api/updateHotel',
+    getAllHotels:'/api/getAllHotels',
 }
 
 export default userRoutes
