@@ -6,58 +6,101 @@ const SearchandSet = () => {
     const [checkIn, setCheckIn] = useState('');
     const [checkOut, setCheckOut] = useState('');
     const [guests, setGuests] = useState('');
+    const [errors, setErrors] = useState({
+        destination: false,
+        checkIn: false,
+        checkOut: false,
+        guests: false
+    });
     const navigate = useNavigate();
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const searchParams = new URLSearchParams({
-            destination,
-            checkIn,
-            checkOut,
-            guests
-        }).toString();
-        console.log('search params in serc',searchParams);
-        
-        navigate(`/explore?${searchParams}`);
+        if (destination && checkIn && checkOut && guests) {
+            const checkInDate = new Date(checkIn);
+            const checkOutDate = new Date(checkOut);
+            const today = new Date();
+            if (checkInDate < today && checkInDate.toDateString()!== today.toDateString()) {
+                setErrors((prevErrors) => ({...prevErrors, checkIn: true }));
+            } else if (checkOutDate < checkInDate) {
+                setErrors((prevErrors) => ({...prevErrors, checkOut: true }));
+            } else {
+                const searchParams = new URLSearchParams({
+                    destination,
+                    checkIn,
+                    checkOut,
+                    guests
+                }).toString();                
+                navigate(`/explore?${searchParams}`);
+            }
+        } else {
+            setErrors({
+                destination:!destination,
+                checkIn:!checkIn,
+                checkOut:!checkOut,
+                guests:!guests
+            });
+        }
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        if (name === 'destination') {
+            setDestination(value);
+            setErrors((prevErrors) => ({...prevErrors, destination:!value }));
+        } else if (name === 'checkIn') {
+            setCheckIn(value);
+            setErrors((prevErrors) => ({...prevErrors, checkIn: false }));
+        } else if (name === 'checkOut') {
+            setCheckOut(value);
+            setErrors((prevErrors) => ({...prevErrors, checkOut: false }));
+        } else if (name === 'guests') {
+            setGuests(value);
+            setErrors((prevErrors) => ({...prevErrors, guests:!value }));
+        }
     };
 
     return (
         <form onSubmit={handleSubmit} className="flex items-center bg-white rounded-full shadow-md p-1 w-full max-w-4xl mx-auto mt-5 font-poppins border border-gray-300">
             <div className="flex-1 p-2 mx-2">
-                <label className="block text-gray-500 text-xs font-bold">Where</label>
+                <label className={`block text-xs font-bold ${errors.destination ? 'text-red-500' : 'text-gray-500'}`}>Where</label>
                 <input
                     type="text"
+                    name="destination"
                     placeholder="Search destinations"
                     value={destination}
-                    onChange={(e) => setDestination(e.target.value)}
+                    onChange={handleInputChange}
                     className="bg-transparent outline-none w-full text-gray-700 text-sm"
                 />
             </div>
             <div className="flex-1 p-2 border-l border-gray-300">
-                <label className="block text-gray-500 text-xs font-bold">Check-in</label>
+            <label className={`block text-xs font-bold ${errors.checkIn ? 'text-red-500' : 'text-gray-500'}`}>Check-in</label>
                 <input
                     type="date"
+                    name="checkIn"
                     value={checkIn}
-                    onChange={(e) => setCheckIn(e.target.value)}
+                    onChange={handleInputChange}
                     className="bg-transparent outline-none w-full text-gray-700 text-sm"
                 />
             </div>
             <div className="flex-1 p-2 border-l border-gray-300">
-                <label className="block text-gray-500 text-xs font-bold">Check-out</label>
+            <label className={`block text-xs font-bold ${errors.checkOut ? 'text-red-500' : 'text-gray-500'}`}>Check-out</label>
                 <input
                     type="date"
+                    name="checkOut"
                     value={checkOut}
-                    onChange={(e) => setCheckOut(e.target.value)}
+                    onChange={handleInputChange}
                     className="bg-transparent outline-none w-full text-gray-700 text-sm"
                 />
             </div>
             <div className="flex-1 p-2 border-l border-gray-300">
-                <label className="block text-gray-500 text-xs font-bold">Guests</label>
+            <label className={`block text-xs font-bold ${errors.guests ? 'text-red-500' : 'text-gray-500'}`}>Guests</label>
                 <input
                     type="number"
+                    name="guests"
                     placeholder="Add guests"
                     value={guests}
-                    onChange={(e) => setGuests(e.target.value)}
+                    onChange={handleInputChange}
                     className="bg-transparent outline-none w-full text-gray-700 text-sm"
                 />
             </div>

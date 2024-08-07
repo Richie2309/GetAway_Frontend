@@ -1,17 +1,30 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
-import { getHotelData } from '../../api/user';
+import { checkAvailability, createBooking, createPaymentIntent, getHotelData } from '../../api/user';
 import { FaParking, FaSnowflake, FaTv, FaWifi } from 'react-icons/fa';
 import Loading from '../../components/user/Loading';
 import { IoMdClose, IoMdPhotos } from "react-icons/io";
+import { loadStripe } from '@stripe/stripe-js';
+import CheckoutForm from '../../components/user/CheckoutForm';
+import { Elements } from '@stripe/react-stripe-js';
+
+const stripePromise = loadStripe('pk_test_51PkPSb2LBaBhNuTqpKiEL1NojZ3qHIbQFmS6DKRZ5lX1UQVoQ4Nzk5Aur1VPka9tiPdoNgYgKudBhZf31QaZ6UWx00n7Qqf78z');
 
 const SingleRoom = () => {
   const { id } = useParams()
   const [hotelData, setHotelData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [showAllPhotos, setShowAllPhotos] = useState(false)
+  const [checkIn, setCheckIn] = useState('');
+  const [checkOut, setCheckOut] = useState('');
+  const [guests, setGuests] = useState(1);
+  const [isAvailable, setIsAvailable] = useState(null);
+  const [error, setError] = useState('');
+  const [showPayment, setShowPayment] = useState(false);
+  const [clientSecret, setClientSecret] = useState("");
 
   useEffect(() => {
+    
     const fetchHotelData = async () => {
       try {
         const response = await getHotelData(id);
@@ -25,6 +38,87 @@ const SingleRoom = () => {
 
     fetchHotelData();
   }, [id]);
+
+  const handleAvailabilityCheck = async () => {
+    if (!checkIn || !checkOut) {
+      setError('Please select check-in and check-out dates.');
+      return;
+    }
+    try {
+      const available = await checkAvailability(id, checkIn, checkOut);
+      setIsAvailable(available);
+      if (!available) {
+        setError('This slot is not available for the selected dates.');
+      } else {
+        setError('');
+      }
+    } catch (err) {
+      setError('Error checking availability. Please try again.');
+    }
+  };
+
+  const handlePayment = async () => {
+    if (!isAvailable) return;
+    try {
+      const nights = (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24);
+      const amount = hotelData.price_per_night * nights;
+      const response = await createPaymentIntent(amount);
+      setClientSecret(response.data.clientSecret);
+      setShowPayment(true);
+    } catch (error) {
+      setError('An error occurred while initializing payment. Please try again.');
+    }
+  };
+
+  const handleBookingSuccess = async () => {
+    try {
+      const nights = (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24);
+      const amount = hotelData.price_per_night * nights;
+      await createBooking(id, checkIn, checkOut, guests, amount);
+      console.log('Booking created successfully');
+      // Handle post-booking actions (e.g., show confirmation, redirect)
+    } catch (error) {
+      setError('Failed to create booking. Please contact support.');
+    }
+  };
+
+  // const handleToken = async (token) => {
+  //   console.log('token',token);
+
+  //   try {
+  //     const nights = (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24);
+  //     const amount = hotelData.price_per_night * nights;
+
+  //     // Create a payment intent
+  //     const response = await createPaymentIntent(amount);
+  //     setClientSecret(response.data.clientSecret);
+  //     setShowPayment(true);
+  //     console.log('clentsecret',clientSecret);
+
+
+  //     // Confirm the payment
+  //     const stripe = await stripePromise;
+  //     const result = await stripe.confirmCardPayment(clientSecret, {
+  //       payment_method: {
+  //         card: token.card,
+  //         billing_details: {
+  //           name: token.name,
+  //         },
+  //       },
+  //     });
+
+  //     if (result.error) {
+  //       setError(result.error.message);
+  //     } else {
+  //       await createBooking(id, checkIn, checkOut, guests, amount);
+  //       console.log('Payment successful and booking created');
+  //       // Handle successful booking 
+  //     }
+  //   } catch (error) {
+  //     setError('An error occurred while processing your payment.');
+  //   }
+  // };
+
 
   if (loading) {
     return <Loading />
@@ -110,30 +204,50 @@ const SingleRoom = () => {
                   <div className="flex">
                     <div className='py-2 px-4'>
                       <label>Check in</label>
-                      <input type="date" />
+                      <input
+                        type="date"
+                        value={checkIn}
+                        onChange={(e) => setCheckIn(e.target.value)}
+                      />
                     </div>
                     <div className='py-2 px-4 border-l'>
                       <label>Check out</label>
-                      <input type="date" />
+                      <input
+                        type="date"
+                        value={checkOut}
+                        onChange={(e) => setCheckOut(e.target.value)}
+                      />
                     </div>
                   </div>
                   <div className='py-2 px-4 border-t'>
                     <label>Number of guests</label>
-                    <select className="w-full border rounded px-2 py-1">
+                    <select
+                      className="w-full border rounded px-2 py-1"
+                      value={guests}
+                      onChange={(e) => setGuests(parseInt(e.target.value))}
+                    >
                       {[...Array(hotelData.maxGuests)].map((_, i) => (
                         <option key={i + 1} value={i + 1}>{i + 1}</option>
                       ))}
                     </select>
                   </div>
                 </div>
-                <button className="w-full bg-red-500 text-white py-2 rounded mt-1">Book</button>
+                {error && <p className="text-red-500 mt-2">{error}</p>}
+                {showPayment && clientSecret ? (
+                  <Elements stripe={stripePromise}>
+                    <CheckoutForm clientSecret={clientSecret} onSuccess={handleBookingSuccess} />
+                  </Elements>
+                ) : (
+                  <button
+                    className="w-full bg-red-500 text-white py-2 rounded mt-4"
+                    onClick={isAvailable ? handlePayment : handleAvailabilityCheck}
+                  >
+                    {isAvailable ? 'Proceed to Payment' : 'Check Availability'}
+                  </button>
+                )}
               </div>
             </div>
           </div>
-
-
-
-
           <h3 className="font-semibold mt-4 mb-2">Location</h3>
           <p className="text-sm">{hotelData.town}, {hotelData.district}, {hotelData.state}</p>
           <p className="text-sm">{hotelData.address}</p>

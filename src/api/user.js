@@ -181,19 +181,50 @@ export const getAllHotels = async (searchData) => {
   }
 }
 
-// export const searchHotel = async (searchParams) => {
-//   try {
-//     const queryString = new URLSearchParams(searchParams).toString()
-//     console.log('query',queryString);
+export const checkAvailability = async (accommodationId, checkIn, checkOut) => {
+  try {
+    const response = await API.get(userRoutes.checkAvailability, { params: { accommodationId, checkIn, checkOut } });
+    return response.data.isAvailable;
+  } catch (err) {
+    console.error('Error checking availability:', err);
+    throw err;
+  }
+};
 
-//     const response = await API.get(`${userRoutes.searchHotel}?${queryString}`)
-//     console.log('resos',response);
+export const createPaymentIntent = async (amount) => {
+  console.log('hello');
+  
+  try {
+    console.log('amount', amount)
+    const response = await API.post(userRoutes.createPaymentIntent, { amount });
+    return response
+  } catch (err) {
+    console.error('Error creating payment intent:', err);
+    throw err;
+  }
+};
 
-//     return response
-//   } catch (err) {
-//     console.log('Error occured while getting hotel informations');
-//     throw err
-//   }
-// }
+export const createBooking = async (accommodationId, checkIn, checkOut, guests, totalPrice) => {
+  console.log('helloooo');
+  console.log('in user boking',accommodationId, checkIn, checkOut, guests, totalPrice);
+  
+  try {
+    const response = await API.post(userRoutes.createBooking, { accommodationId, checkIn, checkOut, guests, totalPrice });
+    return response
+  } catch (err) {
+    console.error('Error creating booking:', err);
+    throw err;
+  }
+};
+
+export const getBookedHotels = async () => {
+  try {
+    const response = await API.get(userRoutes.getBookedHotels)
+    return response
+  } catch (err) {
+    console.log("Error occurred while getting hotels", err);
+    throw err;
+  }
+}
 
 export default userRegister

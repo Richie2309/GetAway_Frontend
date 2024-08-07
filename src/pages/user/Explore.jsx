@@ -25,6 +25,8 @@ const Explore = () => {
         };
 
         const response = await getAllHotels(searchParams);
+        console.log('response',response);
+        
         setHotels(response.data.allHotels);
       } catch (err) {
         console.error('Error fetching hotels:', err);

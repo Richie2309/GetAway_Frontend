@@ -24,8 +24,6 @@ const MyAccommodations = () => {
     navigate(`/profile/accommodations/add-hotel/${hotelId}`);
   };
 
-
-
   return (
     <div className="max-w-4xl mx-auto font-poppins">
       <h2 className="text-2xl font-bold mb-4">My Accommodations</h2>

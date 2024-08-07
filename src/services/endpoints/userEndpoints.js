@@ -18,6 +18,10 @@ const userRoutes = {
     getHotelData: '/api/getHotel',
     updateHotel:'/api/updateHotel',
     getAllHotels:'/api/getAllHotels',
+    checkAvailability:'/api/checkAvailability',
+    createPaymentIntent: '/api/createPaymentIntent',
+    createBooking: '/api/createBooking',
+    getBookedHotels:'/api/getBookedHotels',
 }
 
 export default userRoutes
