@@ -89,11 +89,11 @@ const Header = () => {
             {user && (
               <span className="text-gray-600 pr-10">{userData.fullName }</span>
             )}
-            <button className="text-gray-600 hover:text-gray-900 pr-10">
+            {/* <button className="text-gray-600 hover:text-gray-900 pr-10">
               <svg width="39" height="32" viewBox="0 0 39 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M22.5699 22.72L27.2008 27.2M15.2008 9.60005C17.8517 9.60005 20.0008 11.7491 20.0008 14.4M25.7074 15.2534C25.7074 21.0266 21.0273 25.7067 15.2541 25.7067C9.4809 25.7067 4.80078 21.0266 4.80078 15.2534C4.80078 9.48016 9.4809 4.80005 15.2541 4.80005C21.0273 4.80005 25.7074 9.48016 25.7074 15.2534Z" stroke="black" strokeWidth="2" strokeLinecap="round" />
               </svg>
-            </button>
+            </button> */}
             <div className="relative" ref={dropdownRef}>
               <button onClick={toggleDropdown} className="text-gray-600 hover:text-gray-900 pr-10">
                 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">

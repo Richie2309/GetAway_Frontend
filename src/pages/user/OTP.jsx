@@ -1,13 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import signinform from '../../assets/SignPage.png';
-import {  useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { otpResend, verifyForgotPasswordOtp } from '../../api/user';
 
 const OTP = ({ email }) => {
     const navigate = useNavigate()
-   
-
-    const [timer, setTimer] = useState(120);
+    const [timer, setTimer] = useState(60);
     const [isTimerExpired, setIsTimerExpired] = useState(false);
     const [isResendRequested, setIsResendRequested] = useState(false);
     const [error, setError] = useState(null);
@@ -44,12 +42,13 @@ const OTP = ({ email }) => {
         }
         setLoading(true);
         verifyForgotPasswordOtp(email, otpValue)
-            .then(response => {
+            .then(token => {
                 console.log('OTP verified successfully. Navigating to reset password.');
-
-                navigate('/reset-password', { state: { email, otp: otpValue } });
+                console.log('hi', token);
+                navigate('/reset-password', { state: { email, token } });
             })
             .catch(error => {
+                console.error('Error caught:', error);
                 if (error.response && error.response.data && error.response.data.message) {
                     setError(error.response.data.message);
                 } else {
@@ -133,7 +132,7 @@ const OTP = ({ email }) => {
                     </div>
                     <div className="text-center mt-4 text-sm md:text-base text-zinc-600">
                         {!isTimerExpired ? (
-                            <p>Time remaining: {Math.floor(timer / 60)}:{timer % 60 < 10 ? `0${timer % 60}` : timer % 60}</p>
+                            <p>Resent OTP: {Math.floor(timer / 60)}:{timer % 60 < 10 ? `0${timer % 60}` : timer % 60}</p>
                         ) : (
                             <p>OTP expired. Please request a new one.</p>
                         )}

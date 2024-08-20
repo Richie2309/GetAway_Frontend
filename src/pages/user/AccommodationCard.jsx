@@ -1,10 +1,11 @@
 import React from 'react'
+import { MdAccessTime, MdCreate, MdDeleteOutline } from "react-icons/md";
 
-const AccommodationCard = ({ photos, town, district,state, maxGuests, bedrooms, beds, price_per_night, isverified, onEdit }) => {
+const AccommodationCard = ({ photos, town, district, state, maxGuests, bedrooms, beds, price_per_night, isverified, onEdit, onDelete, onBookingHistory }) => {
 
   return (
-    <div className="bg-gray-100 rounded-lg pt-4 flex items-center space-x-6 font-poppins">
-      <img src={photos[0]} alt={town} className="w-48 h-32 object-cover rounded-lg" />
+    <div className="bg-gray-200 rounded-lg flex items-center h-32 space-x-6 shadow-xl font-poppins">
+      <img src={photos[0]} alt={town} className="w-48 h-32 object-cover rounded-xl shadow-lg" />
       <div className="flex-grow">
         <h3 className="font-semibold">{town}, {district}, {state}</h3>
         <p className="text-sm text-gray-600">
@@ -16,8 +17,15 @@ const AccommodationCard = ({ photos, town, district,state, maxGuests, bedrooms, 
         <span className="text-yellow-600 text-sm">Verification pending ⏳</span>
       ) : (
         <div>
-          <button className="text-blue-500 text-sm mr-2" onClick={onEdit}>Edit</button>
-          <button className="text-red-500 text-sm">Delete</button>
+          <button className="text-yellow-500 mx-2" onClick={onBookingHistory}>
+            <MdAccessTime className='text-lg' />
+          </button>
+          <button className="text-blue-500 mx-2" onClick={onEdit}>
+            <MdCreate className='text-lg' />
+          </button>
+          <button className="text-red-500 mx-2" onClick={onDelete}>
+            <MdDeleteOutline className='text-lg' />
+          </button>
         </div>
       )}
     </div>

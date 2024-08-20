@@ -1,6 +1,7 @@
 import API from "../services/axios"
 import userRoutes from "../services/endpoints/userEndpoints"
 
+//To register user 
 const userRegister = async (fullName, email, password) => {
   try {
     const response = await API.post(userRoutes.register, {
@@ -15,6 +16,7 @@ const userRegister = async (fullName, email, password) => {
   }
 }
 
+//To verify OTP 
 export const otpVerify = async (otp) => {
   try {
     const response = await API.post(userRoutes.otpVerify, {
@@ -27,6 +29,7 @@ export const otpVerify = async (otp) => {
   }
 }
 
+//To resent the OTP
 export const otpResend = async (email) => {
   try {
     const response = await API.post(userRoutes.otpVerify, { email })
@@ -37,6 +40,7 @@ export const otpResend = async (email) => {
   }
 }
 
+//For login with google
 export const googleLogin = async (name, email) => {
   try {
     const response = await API.post(userRoutes.googAuth, { name, email });
@@ -47,6 +51,7 @@ export const googleLogin = async (name, email) => {
   }
 };
 
+//To get user info
 export const getUserData = async () => {
   try {
     const response = await API.get(userRoutes.getUser)
@@ -57,6 +62,7 @@ export const getUserData = async () => {
   }
 }
 
+//To check if email exist
 export const checkMail = async (email) => {
   try {
     const response = await API.get(`${userRoutes.checkMail}?email=${email}`)
@@ -67,20 +73,23 @@ export const checkMail = async (email) => {
   }
 }
 
-
+//To verify the OTP
 export const verifyForgotPasswordOtp = async (email, otp) => {
   try {
     const response = await API.post(userRoutes.verifyForgotPasswordOtp, { email, otp });
-    return response
+    console.log(response);
+
+    return response.data.token
   } catch (err) {
     console.log("Error occured during otp verification", err);
     throw err
   }
 };
 
-export const resetPassword = async (email, password) => {
+//To reset the password 
+export const resetPassword = async (token, email, password) => {
   try {
-    const response = await API.patch(userRoutes.resetPassword, { email, password })
+    const response = await API.patch(userRoutes.resetPassword, { token, email, password })
     return response
   } catch (err) {
     console.log("Error occured during otp verification", err);
@@ -88,6 +97,7 @@ export const resetPassword = async (email, password) => {
   }
 }
 
+//TO update user profile 
 export const updateProfile = async (profile) => {
   try {
     const response = await API.put(userRoutes.updateProfile, { profile });
@@ -98,6 +108,7 @@ export const updateProfile = async (profile) => {
   }
 };
 
+// To update the user password 
 export const updatePassword = async (newPassword) => {
   try {
     const response = await API.put(userRoutes.updatePassword, { newPassword });
@@ -108,6 +119,7 @@ export const updatePassword = async (newPassword) => {
   }
 };
 
+// To update the user identity 
 export const updateIdentity = async (images) => {
   try {
     const response = await API.put(userRoutes.updateIdentity, { images })
@@ -118,6 +130,7 @@ export const updateIdentity = async (images) => {
   }
 };
 
+//To update the bank account details 
 export const updateBankAccount = async (bankAccount) => {
   try {
     const response = await API.put(userRoutes.updateBankAccount, bankAccount);
@@ -128,6 +141,7 @@ export const updateBankAccount = async (bankAccount) => {
   }
 };
 
+//To add a new accommodation
 export const addHotel = async (hotelData) => {
   try {
     const response = await API.post(userRoutes.addHotel, hotelData);
@@ -138,6 +152,7 @@ export const addHotel = async (hotelData) => {
   }
 };
 
+//To get the all accommodation of a user 
 export const getMyHotels = async () => {
   try {
     const response = await API.get(userRoutes.getMyHotels)
@@ -148,6 +163,7 @@ export const getMyHotels = async () => {
   }
 }
 
+// To get get the detial of single accommodation of a user 
 export const getHotelData = async (hotelId) => {
   try {
     const response = await API.get(`${userRoutes.getHotelData}/${hotelId}`)
@@ -158,8 +174,8 @@ export const getHotelData = async (hotelId) => {
   }
 }
 
+//To update accommodation details
 export const editHotel = async (hotelData) => {
-  console.log('hoteldata id in userjs', hotelData);
   try {
     const response = await API.put(userRoutes.updateHotel, hotelData);
     return response;
@@ -169,6 +185,7 @@ export const editHotel = async (hotelData) => {
   }
 };
 
+// To get all accommodation
 export const getAllHotels = async (searchData) => {
   try {
     console.log('searchdata', searchData);
@@ -181,6 +198,7 @@ export const getAllHotels = async (searchData) => {
   }
 }
 
+//To check an accommodation is available at a particular date
 export const checkAvailability = async (accommodationId, checkIn, checkOut) => {
   try {
     const response = await API.get(userRoutes.checkAvailability, { params: { accommodationId, checkIn, checkOut } });
@@ -191,11 +209,9 @@ export const checkAvailability = async (accommodationId, checkIn, checkOut) => {
   }
 };
 
+//To pay the bill
 export const createPaymentIntent = async (amount) => {
-  console.log('hello');
-  
   try {
-    console.log('amount', amount)
     const response = await API.post(userRoutes.createPaymentIntent, { amount });
     return response
   } catch (err) {
@@ -204,10 +220,8 @@ export const createPaymentIntent = async (amount) => {
   }
 };
 
+//To create a booking
 export const createBooking = async (accommodationId, checkIn, checkOut, guests, totalPrice) => {
-  console.log('helloooo');
-  console.log('in user boking',accommodationId, checkIn, checkOut, guests, totalPrice);
-  
   try {
     const response = await API.post(userRoutes.createBooking, { accommodationId, checkIn, checkOut, guests, totalPrice });
     return response
@@ -217,12 +231,70 @@ export const createBooking = async (accommodationId, checkIn, checkOut, guests, 
   }
 };
 
+//To get all the accommodation a user booked
 export const getBookedHotels = async () => {
   try {
     const response = await API.get(userRoutes.getBookedHotels)
     return response
   } catch (err) {
     console.log("Error occurred while getting hotels", err);
+    throw err;
+  }
+}
+
+//To get all the guests of a user
+export const getSchedule = async (hotelId) => {
+  try {
+    const response = await API.get(`${userRoutes.getSchedule}/${hotelId}`)
+    console.log('response in api', response);
+
+    return response
+  } catch (err) {
+    console.log("Error occurred while getting guest details", err);
+    throw err;
+  }
+}
+
+//To get user token
+export const getToken = async () => {
+  try {
+    const response = await API.get(userRoutes.getToken)
+    return response
+  } catch (error) {
+    throw error
+  }
+}
+
+//To get the chats messages
+export const getMessages = async (receiverId) => {
+  try {
+    const response = await API.get(`${userRoutes.getMessage}/${receiverId}`);
+    return response.data;
+  } catch (err) {
+    console.error('Error fetching messages:', err);
+    throw err;
+  }
+}
+
+//To send message
+export const sendMessage = async (receiverId, message) => {
+  try {
+    console.log(receiverId,message);
+    
+    const response = await API.post(`${userRoutes.sendMessage}`, { receiverId, message });
+    return response;
+  } catch (err) {
+    console.error("Error occurred while sending message", err);
+    throw err;
+  }
+}
+
+export const getMessagedUsers=async()=>{
+  try {
+    const response=await API.get(userRoutes.getMessagedUsers)
+    return response.data
+  } catch (err) {
+    console.error('Error fetching messaged users', err);
     throw err;
   }
 }

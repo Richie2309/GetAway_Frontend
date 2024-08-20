@@ -9,7 +9,7 @@ const SignupOtp = (props) => {
   const location = useLocation();
   const state = location.state;
   const email = state;
-  const [timer, setTimer] = useState(120); // 120 seconds = 2 minutes
+  const [timer, setTimer] = useState(60); // 120 seconds = 2 minutes
   const [isTimerExpired, setIsTimerExpired] = useState(false);
   const [isResendRequested, setIsResendRequested] = useState(false);
   const otpInputRef = useRef(null)
@@ -130,7 +130,7 @@ const SignupOtp = (props) => {
 
           <div className="text-center mt-4 text-sm md:text-base text-zinc-600">
             {!isTimerExpired ? (
-              <p>Time remaining: {Math.floor(timer / 60)}:{timer % 60 < 10 ? `0${timer % 60}` : timer % 60}</p>
+              <p>Resent OTP: {Math.floor(timer / 60)}:{timer % 60 < 10 ? `0${timer % 60}` : timer % 60}</p>
             ) : (
               <p>OTP expired. Please request a new one.</p>
             )}

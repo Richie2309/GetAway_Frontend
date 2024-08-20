@@ -6,7 +6,6 @@ import { message } from 'antd';
 import { useDispatch } from 'react-redux';
 import { updateName } from '../../redux/slice/userAuthSlice';
 
-
 const Account = () => {
   const dispatch=useDispatch()
   // State for profile information

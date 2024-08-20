@@ -6,7 +6,7 @@ import { message } from 'antd'; // Import message from antd
 
 const ResetPassword = () => {
   const { state } = useLocation();
-  const { email } = state || {}; 
+  const { email, token } = state || {}; 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState({});
@@ -45,7 +45,7 @@ const ResetPassword = () => {
       setErrors(newErrors);
     } else {
       try {
-        await resetPassword(email, password);
+        await resetPassword(token,email, password);
         message.success('Password updated successfully', 2)
         navigate('/login')
       } catch (error) {

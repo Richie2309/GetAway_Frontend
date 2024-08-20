@@ -58,7 +58,7 @@ const SearchandSet = () => {
             setGuests(value);
             setErrors((prevErrors) => ({...prevErrors, guests:!value }));
         }
-    };
+    }; 
 
     return (
         <form onSubmit={handleSubmit} className="flex items-center bg-white rounded-full shadow-md p-1 w-full max-w-4xl mx-auto mt-5 font-poppins border border-gray-300">

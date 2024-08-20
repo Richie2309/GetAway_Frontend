@@ -6,13 +6,16 @@ import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import store from './redux/store/store.js'
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { SocketContextProvider } from './context/SocketContext.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-    <GoogleOAuthProvider clientId='720734685234-dnl5v0vu72rc0guelqokjn9oq88jrvoi.apps.googleusercontent.com'>
-      <BrowserRouter>
-        <Provider store={store}>
-          <App />
-        </Provider>
-      </BrowserRouter>
-    </GoogleOAuthProvider>
+  <GoogleOAuthProvider clientId='720734685234-dnl5v0vu72rc0guelqokjn9oq88jrvoi.apps.googleusercontent.com'>
+    <BrowserRouter>
+      <Provider store={store}>
+        <SocketContextProvider>
+        <App />
+        </SocketContextProvider>
+      </Provider>
+    </BrowserRouter>
+  </GoogleOAuthProvider>
 )

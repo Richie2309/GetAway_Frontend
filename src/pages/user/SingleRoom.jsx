@@ -7,6 +7,7 @@ import { IoMdClose, IoMdPhotos } from "react-icons/io";
 import { loadStripe } from '@stripe/stripe-js';
 import CheckoutForm from '../../components/user/CheckoutForm';
 import { Elements } from '@stripe/react-stripe-js';
+import BooingSuccess from '../../components/user/BooingSuccess';
 
 const stripePromise = loadStripe('pk_test_51PkPSb2LBaBhNuTqpKiEL1NojZ3qHIbQFmS6DKRZ5lX1UQVoQ4Nzk5Aur1VPka9tiPdoNgYgKudBhZf31QaZ6UWx00n7Qqf78z');
 
@@ -22,6 +23,7 @@ const SingleRoom = () => {
   const [error, setError] = useState('');
   const [showPayment, setShowPayment] = useState(false);
   const [clientSecret, setClientSecret] = useState("");
+  const [bookingSuccess, setBookingSuccess] = useState(false); 
 
   useEffect(() => {
     
@@ -76,48 +78,11 @@ const SingleRoom = () => {
       const amount = hotelData.price_per_night * nights;
       await createBooking(id, checkIn, checkOut, guests, amount);
       console.log('Booking created successfully');
-      // Handle post-booking actions (e.g., show confirmation, redirect)
+      setBookingSuccess(true); 
     } catch (error) {
       setError('Failed to create booking. Please contact support.');
     }
   };
-
-  // const handleToken = async (token) => {
-  //   console.log('token',token);
-
-  //   try {
-  //     const nights = (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24);
-  //     const amount = hotelData.price_per_night * nights;
-
-  //     // Create a payment intent
-  //     const response = await createPaymentIntent(amount);
-  //     setClientSecret(response.data.clientSecret);
-  //     setShowPayment(true);
-  //     console.log('clentsecret',clientSecret);
-
-
-  //     // Confirm the payment
-  //     const stripe = await stripePromise;
-  //     const result = await stripe.confirmCardPayment(clientSecret, {
-  //       payment_method: {
-  //         card: token.card,
-  //         billing_details: {
-  //           name: token.name,
-  //         },
-  //       },
-  //     });
-
-  //     if (result.error) {
-  //       setError(result.error.message);
-  //     } else {
-  //       await createBooking(id, checkIn, checkOut, guests, amount);
-  //       console.log('Payment successful and booking created');
-  //       // Handle successful booking 
-  //     }
-  //   } catch (error) {
-  //     setError('An error occurred while processing your payment.');
-  //   }
-  // };
 
 
   if (loading) {
@@ -126,6 +91,12 @@ const SingleRoom = () => {
 
   if (!hotelData) {
     return <div>Hotel not found</div>;
+  }
+
+  if (bookingSuccess) {
+    return (
+      <BooingSuccess />
+    );
   }
 
   if (showAllPhotos) {
@@ -196,6 +167,7 @@ const SingleRoom = () => {
               </div>
             </div>
             <div>
+              {/* Checkout */}
               <div className='bg-white shadow p-4 rounded-2xl'>
                 <div className='text-2xl text-center'>
                   Price ₹{hotelData.price_per_night}/per night
@@ -252,29 +224,6 @@ const SingleRoom = () => {
           <p className="text-sm">{hotelData.town}, {hotelData.district}, {hotelData.state}</p>
           <p className="text-sm">{hotelData.address}</p>
         </div>
-
-        {/* <div className="border p-4 rounded-lg w-2/5">
-          <p className="font-bold text-xl mb-2">Price ₹{hotelData.price_per_night}/per night</p>
-          <div className="grid grid-cols-2 gap-2 mb-4">
-            <div>
-              <label className="text-sm">Check in:</label>
-              <input type="date" className="w-full border rounded px-2 py-1" />
-            </div>
-            <div>
-              <label className="text-sm">Check out:</label>
-              <input type="date" className="w-full border rounded px-2 py-1" />
-            </div>
-          </div>
-          <div className="mb-4">
-            <label className="text-sm">Number of guests:</label>
-            <select className="w-full border rounded px-2 py-1">
-              {[...Array(hotelData.maxGuests)].map((_, i) => (
-                <option key={i + 1} value={i + 1}>{i + 1}</option>
-              ))}
-            </select>
-          </div>
-          <button className="w-full bg-red-500 text-white py-2 rounded">Book</button>
-        </div> */}
       </div>
 
       {/* Reviews */}
