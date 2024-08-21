@@ -3,11 +3,16 @@ import { FaCloudUploadAlt, FaWifi, FaParking, FaTv, FaSnowflake } from 'react-ic
 import { addHotel, editHotel, getHotelData, getUserData } from '../../api/user';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { message } from 'antd';
+import LocationMap from '../../components/user/LocationMap';
 
 const AddHotel = () => {
   const [titleCharCount, setTitleCharCount] = useState(0);
   const [descriptionCharCount, setDescriptionCharCount] = useState(0);
-  const location = useLocation();
+  const [location, setLocation] = useState({
+    latitude: null,
+    longitude: null,
+  });
+  // const location = useLocation();
   const { hotelId } = useParams();
   const navigate = useNavigate();
   const isEdit = !!hotelId;
@@ -18,6 +23,8 @@ const AddHotel = () => {
     state: '',
     pincode: '',
     address: '',
+    latitude: '',
+    longitude: '',
     description: '',
     photos: [],
     maxGuests: '',
@@ -95,6 +102,29 @@ const AddHotel = () => {
     }
   }, [formData.price_per_night]);
 
+  const handleGetLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            latitude: position.coords.latitude.toString(),
+            longitude: position.coords.longitude.toString(),
+          });
+        },
+        (error) => {
+          console.log('Error getting location:', error);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
+        }
+      );
+    } else {
+      console.log('Geolocation is not supported by this browser.');
+    }
+  };
+
   const handleImageUpload = (e) => {
     const files = e.target.files;
 
@@ -132,8 +162,18 @@ const AddHotel = () => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     const newValue = type === 'checkbox' ? checked : value;
+    if (name === 'latitude') {
+      setFormData((prevState) => ({
+        ...prevState,
+        latitude: newValue,
+      }));
+    } else if (name === 'longitude') {
+      setFormData((prevState) => ({
+        ...prevState,
+        longitude: newValue,
+      }));
 
-    if (type === 'checkbox') {
+    } else if (type === 'checkbox') {
       setFormData(prevState => ({
         ...prevState,
         perks: checked
@@ -212,20 +252,26 @@ const AddHotel = () => {
 
     if (isFormValid && arePhotosValid) {
       try {
+        const hotelData = {
+          ...formData,
+          latitude: location.latitude,
+          longitude: location.longitude,
+        };
+
         if (isEdit) {
-          console.log('form data inn', formData);
-          await editHotel({ ...formData }); message.success('Your accommodation details are updated successfully');
+          await editHotel(hotelData);
+          message.success('Your accommodation details are updated successfully');
         } else {
-          await addHotel(formData);
+          await addHotel(hotelData);
           message.success('Your accommodation details are submitted successfully');
         }
-        navigate('/profile/accommodations')
+        navigate('/profile/accommodations');
       } catch (err) {
         console.log('Error submitting form:', err);
         message.error('Failed to submit accommodation details. Please try again.');
       }
     } else {
-      console.log("Form has errors.");
+      console.log('Form has errors.');
       message.error('Please correct the errors in the form before submitting.');
     }
   };
@@ -320,6 +366,25 @@ const AddHotel = () => {
           ></textarea>
           {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
         </div>
+
+        <div className="mb-5">
+          <span className="text-xl font-semibold">Location</span>
+          <p className="mb-2">Get your current location</p>
+          <div className="flex items-center">
+            <button
+              type="button"
+              onClick={handleGetLocation}
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
+            >
+              Get Location
+            </button><br />
+          </div>
+        </div>
+        {location.latitude && location.longitude && (
+          <div className="my-4">
+            <LocationMap latitude={location.latitude} longitude={location.longitude} />
+          </div>
+        )}
 
         <div className="mb-5">
           <span className='text-xl font-semibold'>Photos</span>

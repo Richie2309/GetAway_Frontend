@@ -15,7 +15,6 @@ export const SocketContextProvider = ({ children }) => {
 
   useEffect(() => {
     const fetchTokenAndConnect = async () => {
-      console.log('aut', authUser);
 
       if (!authUser) {
         if (socket) {

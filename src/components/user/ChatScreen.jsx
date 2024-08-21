@@ -54,23 +54,20 @@ export const ChatScreen = ({ hostId }) => {
     if (newMessage.trim() === '') return;
 
     const message = {
-      senderId: socket.id, // This might be changed to the actual user ID if available
+      senderId: socket.id, 
       receiverId: hostId,
       message: newMessage,
       createdAt: new Date(),
     };
 
     try {
-      // Emit the message event to the backend via Socket.IO
       socket?.emit('sendMessage', message);
 
-      // Save the message to the database using the API call
       await sendMessage(hostId, newMessage);
 
       setMessages((prevMessages) => [...prevMessages, message]);
     } catch (error) {
       console.error("Error sending message", error);
-      // Optionally, you can show an error message to the user
     }
   };
 
@@ -118,7 +115,7 @@ export const ChatScreen = ({ hostId }) => {
         </button> */}
         <button
           onClick={handleSendMessage}
-          disabled={newMessage.trim() === ''} // Disable button if input is empty
+          disabled={newMessage.trim() === ''} 
           className="ml-2 p-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/80 transition duration-200 flex items-center justify-center"
           title="Send Message"
         >

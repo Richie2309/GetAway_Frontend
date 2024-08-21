@@ -8,6 +8,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import CheckoutForm from '../../components/user/CheckoutForm';
 import { Elements } from '@stripe/react-stripe-js';
 import BooingSuccess from '../../components/user/BooingSuccess';
+import LocationMap from '../../components/user/LocationMap';
 
 const stripePromise = loadStripe('pk_test_51PkPSb2LBaBhNuTqpKiEL1NojZ3qHIbQFmS6DKRZ5lX1UQVoQ4Nzk5Aur1VPka9tiPdoNgYgKudBhZf31QaZ6UWx00n7Qqf78z');
 
@@ -23,13 +24,15 @@ const SingleRoom = () => {
   const [error, setError] = useState('');
   const [showPayment, setShowPayment] = useState(false);
   const [clientSecret, setClientSecret] = useState("");
-  const [bookingSuccess, setBookingSuccess] = useState(false); 
+  const [bookingSuccess, setBookingSuccess] = useState(false);
 
   useEffect(() => {
-    
+
     const fetchHotelData = async () => {
       try {
         const response = await getHotelData(id);
+        console.log('res', response.data);
+
         setHotelData(response.data.hotel);
       } catch (error) {
         console.error('Error fetching hotel data:', error);
@@ -78,7 +81,7 @@ const SingleRoom = () => {
       const amount = hotelData.price_per_night * nights;
       await createBooking(id, checkIn, checkOut, guests, amount);
       console.log('Booking created successfully');
-      setBookingSuccess(true); 
+      setBookingSuccess(true);
     } catch (error) {
       setError('Failed to create booking. Please contact support.');
     }
@@ -140,7 +143,6 @@ const SingleRoom = () => {
         </button>
 
       </div>
-
 
       <div className="flex gap-3">
         <div className="flex-grow">
@@ -223,7 +225,13 @@ const SingleRoom = () => {
           <h3 className="font-semibold mt-4 mb-2">Location</h3>
           <p className="text-sm">{hotelData.town}, {hotelData.district}, {hotelData.state}</p>
           <p className="text-sm">{hotelData.address}</p>
+          {hotelData.latitude && hotelData.longitude && (
+            <div className="my-4">
+              <LocationMap latitude={hotelData.latitude} longitude={hotelData.longitude} />
+            </div>
+          )}
         </div>
+
       </div>
 
       {/* Reviews */}

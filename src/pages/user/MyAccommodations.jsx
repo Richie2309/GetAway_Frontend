@@ -64,19 +64,19 @@ const MyAccommodations = () => {
         ))}
       </div>
       {isModalOpen && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-    <button
-      className="absolute top-7 right-7 bg-white rounded-full p-1"
-      onClick={toggleModal}
-    >
-     <MdClose size={30} className='text-red-400' />
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <button
+            className="absolute top-7 right-7 bg-white rounded-full p-1"
+            onClick={toggleModal}
+          >
+            <MdClose size={30} className='text-red-400' />
 
-    </button>
-    <div className="relative bg-white p-4 rounded-lg shadow-lg w-full max-w-5xl h-5/6 mx-4 overflow-y-auto">
-      <HostChatScreen />
-    </div>
-  </div>
-)}
+          </button>
+          <div className="relative bg-white p-4 rounded-lg shadow-lg w-full max-w-5xl h-5/6 mx-4 overflow-y-auto">
+            <HostChatScreen />
+          </div>
+        </div>
+      )}
 
     </div>
   );
