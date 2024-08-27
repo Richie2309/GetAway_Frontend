@@ -24,6 +24,7 @@ const userRoutes = {
     createPaymentIntent: '/api/createPaymentIntent',
     createBooking: '/api/createBooking',
     getBookedHotels: '/api/getBookedHotels',
+    cancelBooking:'/api/cancelBooking',
     getSchedule: '/api/getSchedule',
     getToken:'/api/getToken',
     getMessage: '/api/getMessage',

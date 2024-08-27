@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { getBookedHotels } from '../../api/user'
+import { cancelBooking, getBookedHotels } from '../../api/user'
 import Loading from '../../components/user/Loading';
 import { MdClose, MdOutlineChat } from 'react-icons/md';
 import { ChatScreen } from '../../components/user/ChatScreen';
+import { message } from 'antd';
 
 const MyBookings = () => {
   const [accommodations, setAccommodations] = useState([]);
@@ -14,11 +15,9 @@ const MyBookings = () => {
     const fetchAccommodations = async () => {
       try {
         const response = await getBookedHotels();
-
         setAccommodations(response.data);
       } catch (error) {
         console.error("Error fetching accommodations", error);
-        setError('Error fetching accommodations');
       } finally {
         setLoading(false);
       }
@@ -26,6 +25,36 @@ const MyBookings = () => {
 
     fetchAccommodations();
   }, []);
+
+  const canCancelBooking = (bookedAt) => {
+    if (!bookedAt) return false; // Ensure bookedAt is valid
+    const bookingTime = new Date(bookedAt);
+    const currentTime = new Date();
+    const timeDiff = currentTime - bookingTime;
+    const hoursDiff = timeDiff / (1000 * 60 * 60); // Convert milliseconds to hours
+    return hoursDiff <= 24;
+  };
+
+  const handleCancelBooking = async (bookingId) => {
+    try {
+      const response = await cancelBooking(bookingId);
+      console.log('resdstats',response.status);
+      
+      if (response.status === 200) {
+        setAccommodations(prevAccommodations => {
+          // Create a new array with updated accommodations
+          const updatedAccommodations = prevAccommodations.map(acc =>
+            acc._id === bookingId ? { ...acc, isCancelled: true } : acc
+          );
+          return [...updatedAccommodations]; // Return a new array reference
+        });
+        message.success('Booking cancelled successfully. A refund will be initiated.');
+      }
+    } catch (error) {
+      console.error("Error cancelling booking", error);
+      message.error("Failed to cancel booking. Please try again or contact support.");
+    }
+  }
 
   const handleChatIconClick = (hostId) => {
     setSelectedHostId(hostId);
@@ -63,14 +92,32 @@ const MyBookings = () => {
                     </div>
                   </div>
                 </div>
-                <p className='text-xs mt-1'>#Cancellation available within 24hours of booking</p>
+                {canCancelBooking(accommodation.bookedAt) ? (
+                  <p className="text-xs mt-1">Cancellation available within 24 hours of booking.</p>
+                ) : (
+                  <p className="text-xs mt-1 text-red-400">Cancellation not available after 24 hours of booking.</p>
+                )}
               </div>
-              <div className="absolute bottom-2 right-2">
+              <div className="absolute bottom-2 right-2 flex items-center gap-3">
                 <MdOutlineChat
-                  size={22}
-                  color='green'
-                  onClick={() => handleChatIconClick(accommodation.accommodation.added_by)} />
+                  size={24}
+                  color="green"
+                  onClick={() => handleChatIconClick(accommodation.accommodation.added_by)}
+                />
+                {accommodation.isCancelled ? (
+                  <span className="text-xs text-red-600">Cancelled</span>
+                ) : (
+                  canCancelBooking(accommodation.bookedAt) && (
+                    <button
+                      className="text-xs text-red-600 p-2 rounded-full shadow-lg"
+                      onClick={() => handleCancelBooking(accommodation.bookingId)}
+                    >
+                      Cancel
+                    </button>
+                  )
+                )}
               </div>
+
             </div>
           ))
         )}

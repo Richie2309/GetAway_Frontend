@@ -24,6 +24,7 @@ const SingleRoom = () => {
   const [error, setError] = useState('');
   const [showPayment, setShowPayment] = useState(false);
   const [clientSecret, setClientSecret] = useState("");
+  const [paymentIntentId, setpaymentIntentId] = useState("");
   const [bookingSuccess, setBookingSuccess] = useState(false);
 
   useEffect(() => {
@@ -65,10 +66,15 @@ const SingleRoom = () => {
   const handlePayment = async () => {
     if (!isAvailable) return;
     try {
+      console.log('hererere');
+
       const nights = (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24);
       const amount = hotelData.price_per_night * nights;
       const response = await createPaymentIntent(amount);
+      console.log('res in handlepaymentin', response);
+
       setClientSecret(response.data.clientSecret);
+      setpaymentIntentId(response.data.paymentIntentId)
       setShowPayment(true);
     } catch (error) {
       setError('An error occurred while initializing payment. Please try again.');
@@ -79,7 +85,9 @@ const SingleRoom = () => {
     try {
       const nights = (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24);
       const amount = hotelData.price_per_night * nights;
-      await createBooking(id, checkIn, checkOut, guests, amount);
+      console.log('payi',paymentIntentId);
+      
+      await createBooking(id, checkIn, checkOut, guests, amount, paymentIntentId);
       console.log('Booking created successfully');
       setBookingSuccess(true);
     } catch (error) {

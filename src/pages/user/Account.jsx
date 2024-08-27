@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import ProfileSidebar from '../../components/user/ProfileSidebar';
 import { IoCloudUploadOutline } from 'react-icons/io5';
 import { getUserData, updateBankAccount, updateIdentity, updatePassword, updateProfile } from '../../api/user';
 import { message } from 'antd';

@@ -38,6 +38,8 @@ const HostChatScreen = () => {
 
     // Listen for incoming messages
     socket?.on('newMessage', (message) => {
+      console.log('mes',message);
+      
       if (message.senderId === selectedUser.userId) {
         setMessages((prevMessages) => [...prevMessages, message]);
       }
@@ -146,10 +148,10 @@ const HostChatScreen = () => {
             </div>
             <div className="flex-1 overflow-y-auto p-4">
               {messages.map((msg, index) => (
-                <div key={index} className={`mb-2 ${msg.senderId === selectedUser.userId ? 'text-left' : 'text-right'}`}>
-                  <div className={`inline-block p-2 rounded-lg ${msg.senderId === selectedUser.userId ? 'bg-gray-200' : 'bg-blue-500 text-white'}`}>
+                <div key={index} className={`flex ${msg.senderId === selectedUser.userId ? 'justify-start' : 'justify-end'}`}>
+                  <div className={`max-w-md p-3 rounded-lg ${msg.senderId === selectedUser.userId ? 'bg-accent text-accent-foreground' : 'bg-secondary text-secondary-foreground'} shadow-md`}>
                     <p>{msg.message}</p>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-muted-foreground">
                       {new Date(msg.createdAt).toLocaleTimeString('en-US', {
                         hour: '2-digit',
                         minute: '2-digit',

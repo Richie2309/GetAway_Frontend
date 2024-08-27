@@ -23,10 +23,10 @@ const ProfileSidebar = () => {
             <div className={`w-1 h-6 ${isActive('/profile/accommodations') ? 'bg-red-500' : 'bg-transparent'}`}></div>
             <Link className='flex items-center space-x-2 text-sm' to='accommodations'>My Accommodations</Link>
           </li>
-          <li className={`flex items-center space-x-2 ${isActive('/profile/revenue') ? 'bg-gray-200' : ''}`}>
+          {/* <li className={`flex items-center space-x-2 ${isActive('/profile/revenue') ? 'bg-gray-200' : ''}`}>
             <div className={`w-1 h-6 ${isActive('/profile/revenue') ? 'bg-red-500' : 'bg-transparent'}`}></div>
             <Link className='flex items-center space-x-2 text-sm' to='revenue'>My Revenue</Link>
-          </li>
+          </li> */}
         </ul>
       </div>
       <div className="flex-1 p-4">

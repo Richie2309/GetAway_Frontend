@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FaCloudUploadAlt, FaWifi, FaParking, FaTv, FaSnowflake } from 'react-icons/fa';
 import { addHotel, editHotel, getHotelData, getUserData } from '../../api/user';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import {  useNavigate, useParams } from 'react-router-dom';
 import { message } from 'antd';
 import LocationMap from '../../components/user/LocationMap';
 

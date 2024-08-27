@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { MdSend, MdImage, MdMic } from 'react-icons/md';
+import { MdSend, MdImage, MdMic, MdAttachFile, MdEmojiEmotions } from 'react-icons/md';
 import { getMessages, sendMessage } from '../../api/user';
 import Loading from './Loading';
 import { useSocketContext } from '../../context/SocketContext';
@@ -10,11 +10,13 @@ export const ChatScreen = ({ hostId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const messagesEndRef = useRef(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const fileInputRef = useRef(null);
+
   const { socket } = useSocketContext()
 
   useEffect(() => {
-    console.log('socket', socket);
-
     const fetchMessages = async () => {
       try {
         const response = await getMessages(hostId);
@@ -33,8 +35,8 @@ export const ChatScreen = ({ hostId }) => {
 
     // Listen for incoming messages
     socket?.on('newMessage', (message) => {
-      console.log('newmess', message);
-
+      console.log('mesghere',message);
+      
       if (message.senderId === hostId) {
         setMessages((prevMessages) => [...prevMessages, message]);
       }
@@ -49,21 +51,20 @@ export const ChatScreen = ({ hostId }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
     setNewMessage('');
     if (newMessage.trim() === '') return;
 
     const message = {
-      senderId: socket.id, 
+      senderId: socket.id,
       receiverId: hostId,
       message: newMessage,
       createdAt: new Date(),
     };
-
     try {
-      socket?.emit('sendMessage', message);
-
       await sendMessage(hostId, newMessage);
+      socket?.emit('sendMessage', message);
 
       setMessages((prevMessages) => [...prevMessages, message]);
     } catch (error) {
@@ -115,7 +116,7 @@ export const ChatScreen = ({ hostId }) => {
         </button> */}
         <button
           onClick={handleSendMessage}
-          disabled={newMessage.trim() === ''} 
+          disabled={newMessage.trim() === ''}
           className="ml-2 p-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/80 transition duration-200 flex items-center justify-center"
           title="Send Message"
         >

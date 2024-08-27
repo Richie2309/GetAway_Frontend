@@ -77,8 +77,6 @@ export const checkMail = async (email) => {
 export const verifyForgotPasswordOtp = async (email, otp) => {
   try {
     const response = await API.post(userRoutes.verifyForgotPasswordOtp, { email, otp });
-    console.log(response);
-
     return response.data.token
   } catch (err) {
     console.log("Error occured during otp verification", err);
@@ -188,8 +186,6 @@ export const editHotel = async (hotelData) => {
 // To get all accommodation
 export const getAllHotels = async (searchData) => {
   try {
-    console.log('searchdata', searchData);
-
     const response = await API.get(userRoutes.getAllHotels, { params: searchData })
     return response
   } catch (err) {
@@ -221,9 +217,9 @@ export const createPaymentIntent = async (amount) => {
 };
 
 //To create a booking
-export const createBooking = async (accommodationId, checkIn, checkOut, guests, totalPrice) => {
+export const createBooking = async (accommodationId, checkIn, checkOut, guests, totalPrice, paymentIntentId) => {
   try {
-    const response = await API.post(userRoutes.createBooking, { accommodationId, checkIn, checkOut, guests, totalPrice });
+    const response = await API.post(userRoutes.createBooking, { accommodationId, checkIn, checkOut, guests, totalPrice, paymentIntentId });
     return response
   } catch (err) {
     console.error('Error creating booking:', err);
@@ -242,12 +238,21 @@ export const getBookedHotels = async () => {
   }
 }
 
+//To cancel the booking
+export const cancelBooking = async (bookingId) => {
+  try {
+    const response = await API.post(`${userRoutes.cancelBooking}/${bookingId}`);
+    return response;
+  } catch (err) {
+    console.error('Error cancelling booking:', err);
+    throw err;
+  }
+};
+
 //To get all the guests of a user
 export const getSchedule = async (hotelId) => {
   try {
     const response = await API.get(`${userRoutes.getSchedule}/${hotelId}`)
-    console.log('response in api', response);
-
     return response
   } catch (err) {
     console.log("Error occurred while getting guest details", err);
@@ -279,8 +284,8 @@ export const getMessages = async (receiverId) => {
 //To send message
 export const sendMessage = async (receiverId, message) => {
   try {
-    console.log(receiverId,message);
-    
+    console.log(receiverId, message);
+
     const response = await API.post(`${userRoutes.sendMessage}`, { receiverId, message });
     return response;
   } catch (err) {
@@ -289,9 +294,9 @@ export const sendMessage = async (receiverId, message) => {
   }
 }
 
-export const getMessagedUsers=async()=>{
+export const getMessagedUsers = async () => {
   try {
-    const response=await API.get(userRoutes.getMessagedUsers)
+    const response = await API.get(userRoutes.getMessagedUsers)
     return response.data
   } catch (err) {
     console.error('Error fetching messaged users', err);
