@@ -1,5 +1,3 @@
-import { getSchedule } from "../../api/user"
-
 const userRoutes = {
     register: '/api/register',
     otpVerify: '/api/otpVerify',

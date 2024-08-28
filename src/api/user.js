@@ -282,11 +282,9 @@ export const getMessages = async (receiverId) => {
 }
 
 //To send message
-export const sendMessage = async (receiverId, message) => {
-  try {
-    console.log(receiverId, message);
-
-    const response = await API.post(`${userRoutes.sendMessage}`, { receiverId, message });
+export const sendMessage = async (receiverId, message, type = 'text') => {
+  try {        
+    const response = await API.post(`${userRoutes.sendMessage}`, { receiverId, message, type });
     return response;
   } catch (err) {
     console.error("Error occurred while sending message", err);

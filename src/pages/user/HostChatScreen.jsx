@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { getMessagedUsers, getMessages, sendMessage } from '../../api/user';
 import { useSocketContext } from '../../context/SocketContext';
+import { MdSend, MdMic, MdAttachFile, MdEmojiEmotions } from 'react-icons/md';
+import EmojiPicker from 'emoji-picker-react';
 
 const HostChatScreen = () => {
   const [messagedUsers, setMessagedUsers] = useState([]);
@@ -9,6 +11,12 @@ const HostChatScreen = () => {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [file, setFile] = useState(null);
+  const fileInputRef = useRef(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioBlob, setAudioBlob] = useState(null);
+  const audioRef = useRef(null);
   const messagesEndRef = useRef(null);
   const { socket } = useSocketContext()
 
@@ -17,8 +25,6 @@ const HostChatScreen = () => {
       try {
         setLoading(true);
         const response = await getMessagedUsers();
-        console.log('res', response);
-
         setMessagedUsers(response);
         setLoading(false);
       } catch (err) {
@@ -38,8 +44,6 @@ const HostChatScreen = () => {
 
     // Listen for incoming messages
     socket?.on('newMessage', (message) => {
-      console.log('mes',message);
-      
       if (message.senderId === selectedUser.userId) {
         setMessages((prevMessages) => [...prevMessages, message]);
       }
@@ -74,30 +78,103 @@ const HostChatScreen = () => {
   const handleSendMessage = async (e) => {
     e.preventDefault();
     setNewMessage('');
-    if (!newMessage.trim()) return;
-
-    const message = {
-      senderId: socket.id, // This might be changed to the actual user ID if available
-      receiverId: selectedUser.userId,
-      message: newMessage,
-      createdAt: new Date(),
-    };
+    if (!newMessage.trim() && !file) return;
+    let message;
+    if (file) {
+      const base64 = await convertToBase64(file);
+      message = {
+        senderId: socket.id,
+        receiverId: selectedUser.id,
+        message: base64,
+        type: file.type.split('/')[0], // 'image', 'video', 'audio', or 'application'
+        createdAt: new Date(),
+      };
+    } else if (audioBlob) {
+      const base64 = await convertToBase64(audioBlob);
+      message = {
+        senderId: socket.id,
+        receiverId: selectedUser.id,
+        message: base64,
+        type: 'audio',
+        createdAt: new Date(),
+      };
+    } else {
+      message = {
+        senderId: socket.id,
+        receiverId: selectedUser.id,
+        message: newMessage,
+        type: 'text',
+        createdAt: new Date(),
+      };
+    }
 
     try {
-      // Emit the message event to the backend via Socket.IO
+      await sendMessage(selectedUser.userId, message.message, message.type);
       socket?.emit('send_message', message);
-
-      // Save the message to the database using the API call
-      await sendMessage(selectedUser.userId, newMessage);
-
-      // Optimistically update the UI
       setMessages((prevMessages) => [...prevMessages, message]);
+      setNewMessage('');
+      setFile(null);
+      setAudioBlob(null);
     } catch (error) {
       console.error("Error sending message", error);
-      // Optionally, you can show an error message to the user
     }
   };
 
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    setFile(selectedFile);
+
+
+  };
+
+  const startRecording = () => {
+    setIsRecording(true);
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(stream => {
+        const mediaRecorder = new MediaRecorder(stream);
+        audioRef.current = mediaRecorder;
+        mediaRecorder.start();
+
+        const audioChunks = [];
+        mediaRecorder.addEventListener("dataavailable", event => {
+          audioChunks.push(event.data);
+        });
+
+        mediaRecorder.addEventListener("stop", () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+          setAudioBlob(audioBlob);
+        });
+      })
+      .catch(err => {
+        console.error('Error initializing media stream', err);
+        setIsRecording(false);
+      });
+  };
+
+  const stopRecording = () => {
+    setIsRecording(false);
+  
+    if (audioRef.current && audioRef.current.state !== "inactive") {
+      audioRef.current.stop();
+    } else {
+      console.error('MediaRecorder is not initialized.');
+    }
+  };
+  
+  
+
+  const handleEmojiClick = (emojiObject) => {
+    setNewMessage((prevMessage) => prevMessage + emojiObject.emoji);
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -150,7 +227,11 @@ const HostChatScreen = () => {
               {messages.map((msg, index) => (
                 <div key={index} className={`flex ${msg.senderId === selectedUser.userId ? 'justify-start' : 'justify-end'}`}>
                   <div className={`max-w-md p-3 rounded-lg ${msg.senderId === selectedUser.userId ? 'bg-accent text-accent-foreground' : 'bg-secondary text-secondary-foreground'} shadow-md`}>
-                    <p>{msg.message}</p>
+                    {msg.type === 'text' && <p>{msg.message}</p>}
+                    {msg.type === 'image' && <img src={msg.message} alt="Sent image" className="max-w-full h-auto" />}
+                    {msg.type === 'video' && <video src={msg.message} controls className="max-w-full h-auto" />}
+                    {msg.type === 'audio' && <audio src={msg.message} controls />}
+                    {msg.type === 'file' && <a href={msg.message} target="_blank" rel="noopener noreferrer">Download File</a>}
                     <span className="text-xs text-muted-foreground">
                       {new Date(msg.createdAt).toLocaleTimeString('en-US', {
                         hour: '2-digit',
@@ -163,8 +244,20 @@ const HostChatScreen = () => {
               ))}
               <div ref={messagesEndRef} />
             </div>
-            <form onSubmit={handleSendMessage} className="p-4 border-t">
-              <div className="flex">
+            <div className="p-4 border-t">
+              <div className="flex items-center">
+                <button
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  className="p-2 text-primary hover:text-primary/80 transition duration-200"
+                  title="Send Emoji"
+                >
+                  <MdEmojiEmotions size={24} />
+                </button>
+                {showEmojiPicker && (
+                  <div className="absolute bottom-16 left-4">
+                    <EmojiPicker onEmojiClick={handleEmojiClick} />
+                  </div>
+                )}
                 <input
                   type="text"
                   value={newMessage}
@@ -172,9 +265,33 @@ const HostChatScreen = () => {
                   className="flex-1 border rounded-l-lg p-2"
                   placeholder="Type a message..."
                 />
-                <button type="submit" className="bg-blue-500 text-white rounded-r-lg px-4">Send</button>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  style={{ display: 'none' }}
+                  onChange={handleFileChange}
+                  accept="image/*,video/*,audio/*,application/*"
+                />
+                <button onClick={() => fileInputRef.current.click()} className="ml-2 p-2 text-primary hover:text-primary/80 transition duration-200" title="Send File">
+                  <MdAttachFile size={24} />
+                </button>
+                <button
+                  onMouseDown={startRecording}
+                  onMouseUp={stopRecording}
+                  className={`p-2 text-primary hover:text-primary/80 transition duration-200 ${isRecording ? 'text-red-500' : ''}`}
+                  title="Record Audio"
+                >
+                  <MdMic size={24} />
+                </button>
+                {audioBlob && (
+                  <span className="text-sm text-green-500">Audio recorded</span>
+                )}
+                <button onClick={handleSendMessage}
+                  className="bg-blue-500 text-white rounded-r-lg px-4 py-2">
+                  <MdSend size={20} />
+                </button>
               </div>
-            </form>
+            </div>
           </>
         ) : (
           <div className="h-full flex items-center justify-center text-gray-500">
