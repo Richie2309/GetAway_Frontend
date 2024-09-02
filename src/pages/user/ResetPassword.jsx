@@ -38,7 +38,6 @@ const ResetPassword = () => {
   };
 
   const handleSubmit = async (e) => {
-    console.log(email);
     e.preventDefault();
     const newErrors = validateForm();
     if (Object.keys(newErrors).length > 0) {
@@ -49,7 +48,6 @@ const ResetPassword = () => {
         message.success('Password updated successfully', 2)
         navigate('/login')
       } catch (error) {
-        console.log('Error updating password', error);
         message.error('Failed to update password');
       }
     }

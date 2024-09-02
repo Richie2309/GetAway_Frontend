@@ -8,7 +8,6 @@ const UserManagement = () => {
     const fetchUserData = async () => {
       try {
         const response = await getUserData();
-        console.log(response.data); // Ensure the data structure is as expected
         if (response.data) {
           setUsers(response.data); // Assuming response.data is an array of users
         }

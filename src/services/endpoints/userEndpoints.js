@@ -28,6 +28,9 @@ const userRoutes = {
     getMessage: '/api/getMessage',
     sendMessage: '/api/sendMessage',
     getMessagedUsers:'/api/getMessagedUsers',
+    getReviews:'/api/getReviews',
+    checkIfUserCanReview:'/api/checkIfUserCanReview',
+    addReview:'/api/addReview',
 }
 
 export default userRoutes

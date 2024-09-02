@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import API from '../../services/axios'
 import userRoutes from '../../services/endpoints/userEndpoints';
 
-const SignupOtp = (props) => {
+const SignupOtp = () => {
   const navigate = useNavigate()
   const location = useLocation();
   const state = location.state;
@@ -23,7 +23,7 @@ const SignupOtp = (props) => {
       setIsTimerExpired(false);
 
       API.post(userRoutes.otpResend, { email })
-        .then(response => {
+        .then(() => {
           // Clear OTP input field
           if (otpInputRef.current) {
             otpInputRef.current.value = '';
@@ -43,8 +43,7 @@ const SignupOtp = (props) => {
       return;
     }
     API.post(userRoutes.otpVerify, { email, otp: otpValue })
-      .then(respose => {
-        console.log(respose);
+      .then(() => {
         navigate('/login')
       })
       .catch(error => {

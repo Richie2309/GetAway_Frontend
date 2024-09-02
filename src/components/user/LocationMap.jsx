@@ -6,10 +6,7 @@ const containerStyle = {
   height: '400px'
 };
 
-const center = {
-  lat: 0,
-  lng: 0
-};
+
 
 const LocationMap = ({ latitude, longitude }) => {
   const mapCenter = {

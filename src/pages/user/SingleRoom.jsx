@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
-import { checkAvailability, createBooking, createPaymentIntent, getHotelData } from '../../api/user';
+import { addReview, checkAvailability, checkIfUserCanReview, createBooking, createPaymentIntent, getHotelData, getReviews } from '../../api/user';
 import { FaParking, FaSnowflake, FaTv, FaWifi } from 'react-icons/fa';
 import Loading from '../../components/user/Loading';
 import { IoMdClose, IoMdPhotos } from "react-icons/io";
@@ -9,6 +9,7 @@ import CheckoutForm from '../../components/user/CheckoutForm';
 import { Elements } from '@stripe/react-stripe-js';
 import BooingSuccess from '../../components/user/BooingSuccess';
 import LocationMap from '../../components/user/LocationMap';
+import { message } from 'antd';
 
 const stripePromise = loadStripe('pk_test_51PkPSb2LBaBhNuTqpKiEL1NojZ3qHIbQFmS6DKRZ5lX1UQVoQ4Nzk5Aur1VPka9tiPdoNgYgKudBhZf31QaZ6UWx00n7Qqf78z');
 
@@ -26,15 +27,21 @@ const SingleRoom = () => {
   const [clientSecret, setClientSecret] = useState("");
   const [paymentIntentId, setpaymentIntentId] = useState("");
   const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [userReview, setUserReview] = useState({ rating: 0, comment: '' });
+  const [canReview, setCanReview] = useState(false);
 
   useEffect(() => {
-
     const fetchHotelData = async () => {
       try {
         const response = await getHotelData(id);
-        console.log('res', response.data);
-
         setHotelData(response.data.hotel);
+
+        const canReviewUser = await checkIfUserCanReview(id);
+        setCanReview(canReviewUser.canReview);
+
+        const reviewsResponse = await getReviews(id);
+        setReviews(reviewsResponse);
       } catch (error) {
         console.error('Error fetching hotel data:', error);
       } finally {
@@ -66,13 +73,9 @@ const SingleRoom = () => {
   const handlePayment = async () => {
     if (!isAvailable) return;
     try {
-      console.log('hererere');
-
       const nights = (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24);
       const amount = hotelData.price_per_night * nights;
       const response = await createPaymentIntent(amount);
-      console.log('res in handlepaymentin', response);
-
       setClientSecret(response.data.clientSecret);
       setpaymentIntentId(response.data.paymentIntentId)
       setShowPayment(true);
@@ -85,16 +88,38 @@ const SingleRoom = () => {
     try {
       const nights = (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24);
       const amount = hotelData.price_per_night * nights;
-      console.log('payi',paymentIntentId);
-      
       await createBooking(id, checkIn, checkOut, guests, amount, paymentIntentId);
-      console.log('Booking created successfully');
       setBookingSuccess(true);
     } catch (error) {
       setError('Failed to create booking. Please contact support.');
     }
   };
 
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!canReview) {
+      message.warning('You have already submitted a review for this accommodation.');
+      return;
+    }
+    try {
+      const response = await addReview(id, userReview);
+      console.log('res',response);
+      setReviews([response, ...reviews]);
+      console.log('revies',reviews);
+      
+      
+      // Hide the review form by setting canReview to false
+      setCanReview(false);
+      console.log('can',canReview);
+      // setReviews([response.data.review, ...reviews]);
+      // setCanReview(false);
+      // setUserReview({ rating: 0, comment: '' });
+      
+      message.success('Review submitted successfully!');
+    } catch (error) {
+      setError('Failed to submit review. Please try again.');
+    }
+  };
 
   if (loading) {
     return <Loading />
@@ -243,21 +268,51 @@ const SingleRoom = () => {
       </div>
 
       {/* Reviews */}
+      {/* Reviews */}
       <div className="mt-8">
-        <h2 className="text-xl font-bold mb-4">5 reviews</h2>
-        <div className="mb-4">
-          <p className="font-semibold">Bharati</p>
-          <div className="flex mb-1">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <svg key={star} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-            ))}
+        <h2 className="text-xl font-bold mb-4">Reviews ({reviews.length})</h2>
+        {canReview && (
+          <form onSubmit={handleReviewSubmit} className="mb-4">
+            <div className="mb-2">
+              <label className="block">Rating:</label>
+              <select
+                value={userReview.rating}
+                onChange={(e) => setUserReview({ ...userReview, rating: parseInt(e.target.value) })}
+                className="border rounded px-2 py-1"
+              >
+                <option value="0">Select rating</option>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <option key={star} value={star}>{star} stars</option>
+                ))}
+              </select>
+            </div>
+            <div className="mb-2">
+              <label className="block">Comment:</label>
+              <textarea
+                value={userReview.comment}
+                onChange={(e) => setUserReview({ ...userReview, comment: e.target.value })}
+                className="w-full border rounded px-2 py-1"
+                rows="3"
+              ></textarea>
+            </div>
+            <button type="submit" className="bg-blue-500 text-white py-1 px-4 rounded">Submit Review</button>
+          </form>
+        )}
+        {reviews.map((review) => (
+          <div key={review._id} className="mb-4">
+            <p className="font-semibold">{review.user.fullName}</p>
+            <div className="flex mb-1">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <svg key={star} className={`w-4 h-4 ${star <= review.rating ? 'text-yellow-400' : 'text-gray-300'}`} fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              ))}
+            </div>
+            <p className="text-sm text-gray-600">{new Date(review.createdAt).toLocaleDateString()}</p>
+            <p className="text-sm mt-1">{review.comment}</p>
           </div>
-          <p className="text-sm text-gray-600">April 2023</p>
-          <p className="text-sm mt-1">The place was awesome, had a peaceful sleep and people were so kind and helpful. Food(Dinner) was yummy and breakfast was so satisfying with pure cow milk chai.. just lov.</p>
-        </div>
-        <button className="text-blue-500">Show more</button>
+        ))}
+        {reviews.length > 5 && <button className="text-blue-500">Show more</button>}
       </div>
     </div>
 

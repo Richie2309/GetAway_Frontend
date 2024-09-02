@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import signinform from '../../assets/SignPage.png'
 import userRoutes from '../../services/endpoints/userEndpoints';
 import { Link, useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import API from '../../services/axios';
 import axios from 'axios';
@@ -29,7 +29,6 @@ const Signin = () => {
       const { email, password } = data;
 
       const response = await API.post(userRoutes.login, { email, password })
-      console.log('response.data', response.data);
       if (response.data.message == 'Successfuly login') {
         dispatch(login())
         dispatch(userData(response.data.userData))
@@ -41,7 +40,7 @@ const Signin = () => {
     } catch (err) {
       console.error('Error during login:', err);
       if (axios.isAxiosError(err)) {
-        const { message, errorField } = err.response.data;
+        const { errorField } = err.response.data;
         if (errorField === 'email') {
           setBackendError({ ...backendError, email: 'This email is not registered' });
         } else if (errorField === 'password') {
@@ -54,7 +53,7 @@ const Signin = () => {
     }
   }
 
-  const clearErrorsOnChange = (e) => {
+  const clearErrorsOnChange = () => {
     setBackendError('');
   };
 
@@ -62,11 +61,9 @@ const Signin = () => {
     try {
       const decodedCredential = jwtDecode(credentialResponse.credential)
       const { name, email } = decodedCredential
-      console.log('Google credential decoded:', decodedCredential);
 
       const response = await googleLogin(name, email)
       if (response.status == 200) {
-        console.log('yeej login google');
         dispatch(login())
         navigate('/');
       }
@@ -146,13 +143,12 @@ const Signin = () => {
                 <GoogleLogin
                   onSuccess={handleGoogleLogin}
                   onError={() => {
-                    console.log('Login Failed');
                     toast.error('Google login failed, please try again');
                   }}
                 />
               </div>
               <p className="mt-4 text-center text-sm text-zinc-600">
-                Don't have an account yet?<Link to={'/signup'}><span className="text-red-600"> Sign up</span></Link>
+                Dont have an account yet?<Link to={'/signup'}><span className="text-red-600"> Sign up</span></Link>
               </p>
             </div>
           </div>

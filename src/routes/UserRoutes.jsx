@@ -25,7 +25,7 @@ const UserRoutes = () => {
         const response = await API.get(userRoutes.getUser)
         dispatch(userData(response.data.user))
       } catch (error) {
-        console.log(error);
+        console.error(error);
       } finally {
         setIsLoading(false)
       }

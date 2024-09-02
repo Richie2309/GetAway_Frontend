@@ -22,20 +22,20 @@ useEffect(() => {
 }, []);
 
 
-// const handleBlockUnblock = async (hotelId) => {
-//   try {
-//     const response = await toggleBlockHotel(hotelId);
-//     const updatedHotel = response.data;
+const handleBlockUnblock = async (hotelId) => {
+  // try {
+  //   const response = await toggleBlockHotel(hotelId);
+  //   const updatedHotel = response.data;
 
-//     setHotels((prevHotels) =>
-//       prevHotels.map((hotel) =>
-//         hotel._id === updatedHotel._id ? updatedHotel : hotel
-//       )
-//     );
-//   } catch (error) {
-//     console.error('Error toggling block status:', error);
-//   }
-// };
+  //   setHotels((prevHotels) =>
+  //     prevHotels.map((hotel) =>
+  //       hotel._id === updatedHotel._id ? updatedHotel : hotel
+  //     )
+  //   );
+  // } catch (error) {
+  //   console.error('Error toggling block status:', error);
+  // }
+};
 
   return (
     <section className="bg-zinc-100 p-3 sm:p-5 w-full h-screen font-poppins">

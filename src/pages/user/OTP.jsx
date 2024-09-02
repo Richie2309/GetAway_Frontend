@@ -19,7 +19,7 @@ const OTP = ({ email }) => {
             setIsTimerExpired(false);
 
             otpResend(email)
-                .then(response => {
+                .then(() => {
                     if (otpInputRef.current) {
                         otpInputRef.current.value = '';
                     }
@@ -33,7 +33,6 @@ const OTP = ({ email }) => {
     }
 
     const handleConfirm = (e) => {
-        console.log(email);
         e.preventDefault();
         const otpValue = otpInputRef.current?.value;
         if (!otpValue) {
@@ -43,8 +42,6 @@ const OTP = ({ email }) => {
         setLoading(true);
         verifyForgotPasswordOtp(email, otpValue)
             .then(token => {
-                console.log('OTP verified successfully. Navigating to reset password.');
-                console.log('hi', token);
                 navigate('/reset-password', { state: { email, token } });
             })
             .catch(error => {

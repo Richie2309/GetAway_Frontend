@@ -27,7 +27,6 @@ export const SocketContextProvider = ({ children }) => {
       try {
         const response = await getToken();
         const token = response.data;
-        console.log(token);
 
         const socketInstance = io("http://localhost:3000", {
           auth: {
@@ -42,7 +41,6 @@ export const SocketContextProvider = ({ children }) => {
         setSocket(socketInstance);
 
         return () => {
-          console.log("Socket disconnected:", socketInstance.id);
           socketInstance.close();
         };
       } catch (error) {

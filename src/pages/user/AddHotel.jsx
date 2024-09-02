@@ -63,7 +63,7 @@ const AddHotel = () => {
           setInfoIncomplete(false);
         }
       } catch (err) {
-        console.log('Error getting user data:', err);
+        console.error('Error getting user data:', err);
       }
     };
 
@@ -75,14 +75,13 @@ const AddHotel = () => {
       if (isEdit) {
         try {
           const response = await getHotelData(hotelId);
-          console.log('hellhho', response.data);
           const fetchedHotelData = response.data.hotel;
           setFormData(prevState => ({
             ...prevState,
             ...fetchedHotelData,
           }));
         } catch (err) {
-          console.log('Failed to fetch hotel details:', err);
+          console.error('Failed to fetch hotel details:', err);
         }
       }
     };
@@ -112,7 +111,7 @@ const AddHotel = () => {
           });
         },
         (error) => {
-          console.log('Error getting location:', error);
+          console.error('Error getting location:', error);
         },
         {
           enableHighAccuracy: true,
@@ -121,7 +120,7 @@ const AddHotel = () => {
         }
       );
     } else {
-      console.log('Geolocation is not supported by this browser.');
+      console.error('Geolocation is not supported by this browser.');
     }
   };
 
@@ -153,7 +152,6 @@ const AddHotel = () => {
         }
         reader.readAsDataURL(file);
       } catch (err) {
-        console.log('Error uploading image:', err);
         setImageError('Failed to upload image. Please try again.');
       }
     }
@@ -267,11 +265,9 @@ const AddHotel = () => {
         }
         navigate('/profile/accommodations');
       } catch (err) {
-        console.log('Error submitting form:', err);
         message.error('Failed to submit accommodation details. Please try again.');
       }
     } else {
-      console.log('Form has errors.');
       message.error('Please correct the errors in the form before submitting.');
     }
   };

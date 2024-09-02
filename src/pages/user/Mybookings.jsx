@@ -37,9 +37,7 @@ const MyBookings = () => {
 
   const handleCancelBooking = async (bookingId) => {
     try {
-      const response = await cancelBooking(bookingId);
-      console.log('resdstats',response.status);
-      
+      const response = await cancelBooking(bookingId);      
       if (response.status === 200) {
         setAccommodations(prevAccommodations => {
           // Create a new array with updated accommodations

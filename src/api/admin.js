@@ -6,7 +6,7 @@ export const getUserData = async () => {
     const response = await API.get(adminRoutes.getUser)
     return response
   } catch (err) {
-    console.log('Error getting user data');
+    console.error('Error getting user data');
     throw err
   }
 }
@@ -16,7 +16,7 @@ export const toggleBlockUser = async (userId) => {
     const response = await API.patch(`${adminRoutes.toggleBlockUser}/${userId}`);
     return response;
   } catch (err) {
-    console.log('Error getting user data');
+    console.error('Error getting user data');
     throw err
   }
 }
@@ -26,8 +26,8 @@ export const getHotelData = async () => {
     const response = await API.get(adminRoutes.getHotels)
     return response
   } catch (error) {
-    console.log('Error getting hotel data');
-    throw err
+    console.error('Error getting hotel data');
+    throw error;
   }
 }
 export const getHotelById = async (hotelId) => {
@@ -35,7 +35,7 @@ export const getHotelById = async (hotelId) => {
     const response = await API.get(`${adminRoutes.getHotelById}/${hotelId}`);
     return response;
   } catch (err) {
-    console.log('Error getting hotel details');
+    console.error('Error getting hotel details');
     throw err;
   }
 }
@@ -43,7 +43,6 @@ export const getHotelById = async (hotelId) => {
 export const approveHotel = async (hotelId) => {
   try {
     const response = await API.post(`${adminRoutes.approveHotel}/${hotelId}`);
-    console.log("response approveHotel : ",response.data);
     return response.data;
   } catch (err) {
     console.error('Error approving hotel:', err);

@@ -29,9 +29,7 @@ const CheckoutForm = ({ clientSecret, onSuccess }) => {
       setError(result.error.message);
     } else {
       if (result.paymentIntent.status === 'succeeded') {
-        // Show a success message to your customer
-        onSuccess(); // Call onSuccess to handle post-payment actions
-        console.log('Payment succeeded!');
+        onSuccess(); 
       }
     }
 

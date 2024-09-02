@@ -15,7 +15,7 @@ const VerifyHotel = () => {
         const response = await getHotelById(hotelId);
         setHotelDetails(response.data);
       } catch (error) {
-        console.log('Error fetching hotel details', error);
+        console.error('Error fetching hotel details', error);
       }
     };
 

@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, {  useState } from 'react'
 import signinform from '../../assets/SignPage.png'
 import { checkMail } from '../../api/user';
 import OTP from './OTP';
-import { message } from 'antd';
-
 
 const ForgotPassword = () => {
 

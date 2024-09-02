@@ -1,28 +1,23 @@
 import React, { useState } from 'react'
 import signinform from '../../assets/SignPage.png'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useForm } from "react-hook-form";
 import userRoutes from '../../services/endpoints/userEndpoints';
 import API from '../../services/axios';
 import SignupOtp from './SignupOtp';
-import { useDispatch } from 'react-redux';
 import axios from 'axios';
 
 const Signup = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
-  const [isOtpSend, setIsOtpSend] = useState(false)
-  const [email, setEmail] = useState('');
+
   const [error, setError] = useState('');
   const [gotoOtp, setGotoOtp] = useState(false)
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
 
   const onSubmit = async (data) => {
     try {
       const { fullName, email, password } = data;
 
       const response = await API.post(userRoutes.register, { fullName, email, password })
-      console.log('response.data', response.data);
       if (response.data.message == 'User registered, OTP sent') {
         setGotoOtp(true)
       }

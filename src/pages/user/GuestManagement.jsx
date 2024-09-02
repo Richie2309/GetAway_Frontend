@@ -10,9 +10,7 @@ const GuestManagement = () => {
   useEffect(() => {      
     const fetchBookings = async () => {
       try {
-        const response = await getSchedule(hotelId);
-        console.log('res',response.data);
-        
+        const response = await getSchedule(hotelId);        
         setBookings(response.data);
       } catch (error) {
         console.error('Error fetching booking details', error);

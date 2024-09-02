@@ -55,7 +55,6 @@ const Account = () => {
       try {
         const response = await getUserData();
         const userData = response.data.user;
-        console.log(userData);
         setProfile({
           fullName: userData.fullName,
           email: userData.email,
@@ -70,7 +69,7 @@ const Account = () => {
         setIdentityImages(userData.id_proof || []);
 
       } catch (err) {
-        console.log('Error getting user data:', err);
+        console.error('Error getting user data:', err);
       }
     };
 
@@ -152,7 +151,6 @@ const Account = () => {
         message.success('Profile updated successfully');
         dispatch(updateName(profile.fullName))
       } catch (err) {
-        console.log('Error updating profile:', err);
         message.error('Failed to update profile');
       }
     }
@@ -164,9 +162,7 @@ const Account = () => {
       try {
         await updatePassword(passwords.newPassword);
         message.success('Password changed successfully');
-        console.log('Password changed successfully');
       } catch (error) {
-        console.log('Error changing password:', error);
         message.error('Failed to change password');
       }
     }
@@ -180,7 +176,6 @@ const Account = () => {
         message.success('Identity verification successful');
         setIdentityError('');
       } catch (error) {
-        console.log('Error verifying identity:', error);
         message.error('Failed to verify identity. Please try again.');
         setIdentityError('Failed to verify identity. Please try again.');
       }
@@ -217,7 +212,6 @@ const Account = () => {
         await updateIdentity(identityImages);
         message.success('Identity images uploaded successfully');
       } catch (error) {
-        console.log('Error uploading identity image:', error);
         setIdentityError('Failed to upload image. Please try again.');
         message.error('Failed to upload image. Please try again.');
       }
@@ -231,7 +225,6 @@ const Account = () => {
         await updateBankAccount(bankAccount);
         message.success('Bank account added successfully');
       } catch (error) {
-        console.log('Error adding bank account:', error);
         message.error('Failed to add bank account');
       }
     }
@@ -313,7 +306,7 @@ const Account = () => {
             {/* Identity Verification Form */}
             <form onSubmit={handleIdentityVerification} className="space-y-6 mt-10">
               <h2 className="text-xl font-semibold mb-2">Verify your identity</h2>
-              <span>Upload your Passport/Driver's license/Identity card</span>
+              <span>Upload your Passport/Drivers license/Identity card</span>
               <div className="w-1/2 flex justify-center border-2 border-gray-200 rounded-2xl py-4">
                 <div className="space-y-1 text-center">
                   <IoCloudUploadOutline className="mx-auto h-12 w-12 text-gray-400" />
@@ -340,7 +333,7 @@ const Account = () => {
                   )
                 ))}
               </div>
-              <p className="text-primary text-sm mt-2">Your ID will be handled according to our <a href="#" className="text-accent">Privacy Policy</a> and won't be shared with your Host or guests.</p>
+              <p className="text-primary text-sm mt-2">Your ID will be handled according to our <a href="#" className="text-accent">Privacy Policy</a> and wont be shared with your Host or guests.</p>
               <button type="submit" className="w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 mb-11">Save</button>
             </form>
 
