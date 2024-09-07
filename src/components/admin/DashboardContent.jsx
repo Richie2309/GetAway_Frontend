@@ -1,5 +1,6 @@
 // src/pages/admin/DashboardContent.jsx
 import React from 'react';
+import SalesGraph from './SalesGraph';
 
 const DashboardContent = () => {
   return (
@@ -28,10 +29,7 @@ const DashboardContent = () => {
               <p className="text-2xl text-black">₹10000</p>
             </div>
           </div>
-          <div>
-            <h2 className="text-lg font-semibold mb-4 text-black">Sales Graph</h2>
-            <div className="bg-gray-200 h-64 rounded-lg"></div>
-          </div>
+          <SalesGraph />
         </div>
       </div>
     </div>

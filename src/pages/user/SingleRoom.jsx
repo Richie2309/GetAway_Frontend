@@ -103,18 +103,8 @@ const SingleRoom = () => {
     }
     try {
       const response = await addReview(id, userReview);
-      console.log('res',response);
       setReviews([response, ...reviews]);
-      console.log('revies',reviews);
-      
-      
-      // Hide the review form by setting canReview to false
       setCanReview(false);
-      console.log('can',canReview);
-      // setReviews([response.data.review, ...reviews]);
-      // setCanReview(false);
-      // setUserReview({ rating: 0, comment: '' });
-      
       message.success('Review submitted successfully!');
     } catch (error) {
       setError('Failed to submit review. Please try again.');

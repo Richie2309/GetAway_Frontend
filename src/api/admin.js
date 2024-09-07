@@ -50,7 +50,7 @@ export const approveHotel = async (hotelId) => {
   }
 };
 
-export const rejectHotel= async (hotelId, reason) => {
+export const rejectHotel = async (hotelId, reason) => {
   try {
     const response = await API.patch(adminRoutes.rejectHotel, { hotelId, reason });
     return response.data;
@@ -58,4 +58,19 @@ export const rejectHotel= async (hotelId, reason) => {
     console.error('Error rejecting hotel:', err);
     throw err;
   }
+};
+
+export const getDailySales = async () => {
+  const response = await API.get(adminRoutes.getDailySales);
+  return response.data;
+};
+
+// export const getWeeklySales = async () => {
+//   const response = await API.get(adminRoutes.getWeeklySales);
+//   return response.data;
+// };
+
+export const getMonthlySales = async () => {
+  const response = await API.get(adminRoutes.getMonthlySales);
+  return response.data;
 };
