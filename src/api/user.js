@@ -300,7 +300,7 @@ export const getMessagedUsers = async () => {
 
 export const getReviews = async (accommodationId) => {
   try {
-    const response = await API.get(`${userRoutes.getReviews}/${accommodationId}`)     
+    const response = await API.get(`${userRoutes.getReviews}/${accommodationId}`)
     return response.data
   } catch (err) {
     console.error(err);
@@ -309,19 +309,28 @@ export const getReviews = async (accommodationId) => {
 
 export const checkIfUserCanReview = async (accommodationId) => {
   try {
-    const response = await API.get(`${userRoutes.checkIfUserCanReview}/${accommodationId}`)    
+    const response = await API.get(`${userRoutes.checkIfUserCanReview}/${accommodationId}`)
     return response.data
   } catch (err) {
     console.error(err);
   }
 }
 
-export const addReview = async (accommodationId, reviewData) => { 
+export const addReview = async (accommodationId, reviewData) => {
   try {
-    const response = await API.post(`${userRoutes.addReview}/${accommodationId}`,reviewData)   
+    const response = await API.post(`${userRoutes.addReview}/${accommodationId}`, reviewData)
     return response.data
   } catch (err) {
     console.error(err);
+  }
+}
+
+export const getTopThreeAccommodations = async () => {
+  try {
+    const response = await API.get(userRoutes.topThree)    
+    return response.data
+  } catch (err) {
+    console.error(err)
   }
 }
 

@@ -8,7 +8,8 @@ const adminRoutes = {
     rejectHotel: '/api/admin/reject-hotel',
     getDailySales: '/api/admin/sales/daily',
     // getWeeklySales: '/api/admin/sales/weekly',
-    getMonthlySales: '/api/admin/sales/monthly'
+    getMonthlySales: '/api/admin/sales/monthly',
+    dashboard:'/api/admin/dashboard-stats'
 }
 
 export default adminRoutes

@@ -1,8 +1,25 @@
 // src/pages/admin/DashboardContent.jsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import SalesGraph from './SalesGraph';
+import { getDashboardStats } from '../../api/admin';
 
 const DashboardContent = () => {
+
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalAccommodations: 0,
+    totalProfit: 0,
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {      
+      const data = await getDashboardStats();
+      setStats(data);
+    };
+    fetchStats();
+  }, []);
+
+
   return (
     <div className="w-full flex-1 min-h-screen bg-zinc-100 p-4 font-poppins">
       <header className="bg-white shadow p-4 flex justify-between items-center">
@@ -18,15 +35,15 @@ const DashboardContent = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="bg-white p-6 rounded-lg shadow-lg text-center">
               <h2 className="text-lg font-semibold text-black">Users</h2>
-              <p className="text-2xl text-black">120</p>
+              <p className="text-2xl text-black">{stats.totalUsers}</p>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-lg text-center">
               <h2 className="text-lg font-semibold text-black">Accommodations</h2>
-              <p className="text-2xl text-black">40</p>
+              <p className="text-2xl text-black">{stats.totalAccommodations}</p>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-lg text-center">
               <h2 className="text-lg font-semibold text-black">Profit</h2>
-              <p className="text-2xl text-black">₹10000</p>
+              <p className="text-2xl text-black">₹{stats.totalProfit}</p>
             </div>
           </div>
           <SalesGraph />

@@ -31,6 +31,7 @@ const userRoutes = {
     getReviews:'/api/getReviews',
     checkIfUserCanReview:'/api/checkIfUserCanReview',
     addReview:'/api/addReview',
+    topThree:'/api/top-three',
 }
 
 export default userRoutes

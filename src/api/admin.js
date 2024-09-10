@@ -74,3 +74,13 @@ export const getMonthlySales = async () => {
   const response = await API.get(adminRoutes.getMonthlySales);
   return response.data;
 };
+
+export const getDashboardStats = async () => {
+  try {
+    const response = await API.get(adminRoutes.dashboard);        
+    return response.data;
+  } catch (err) {
+    console.error('Error fetching dashboard stats:', err);
+    throw err
+  }
+};
