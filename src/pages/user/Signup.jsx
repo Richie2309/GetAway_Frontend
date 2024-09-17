@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react';
 import signinform from '../../assets/SignPage.png'
 import { Link } from 'react-router-dom'
 import { useForm } from "react-hook-form";
@@ -12,6 +13,7 @@ const Signup = () => {
 
   const [error, setError] = useState('');
   const [gotoOtp, setGotoOtp] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (data) => {
     try {
@@ -74,19 +76,24 @@ const Signup = () => {
                   <label className="block text-sm font-medium text-zinc-700">
                     Password
                   </label>
-                  <input
-                    type="password"
-                    {...register('password', {
-                      required: 'Password is required',
-                      pattern: {
-                        value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
-                        message: 'Password must be at least 8 characters long and include letters, at least one digit, and a symbol'
-                      }
-                    })}
-                    className="mt-1 block w-full px-3 py-2 border border-zinc-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                    placeholder="Password"
-                    autoComplete="current-password"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      {...register('password', {
+                        required: 'Password is required',
+                        pattern: {
+                          value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
+                          message: 'Password must be at least 8 characters long and include letters, at least one digit, and a symbol'
+                        }
+                      })}
+                      className="mt-1 block w-full px-3 py-2 border border-zinc-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                      placeholder="Password"
+                      autoComplete="current-password"
+                    />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-3 flex items-center">
+                      {showPassword ? <EyeOff className="h-5 w-5 text-gray-600" /> : <Eye className="h-5 w-5 text-gray-600" />}
+                    </button>
+                  </div>
                   {errors.password ? <p className="text-red-600 text-sm mt-1">{errors.password.message}</p> : <p className="invisible">-</p>}
                 </div>
                 <div>

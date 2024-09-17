@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import { IoCloudUploadOutline } from 'react-icons/io5';
 import { getUserData, updateBankAccount, updateIdentity, updatePassword, updateProfile } from '../../api/user';
 import { message } from 'antd';
@@ -6,7 +7,9 @@ import { useDispatch } from 'react-redux';
 import { updateName } from '../../redux/slice/userAuthSlice';
 
 const Account = () => {
-  const dispatch=useDispatch()
+  const dispatch = useDispatch()
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   // State for profile information
   const [profile, setProfile] = useState({
     fullName: '',
@@ -89,7 +92,7 @@ const Account = () => {
       errors.phone = 'Phone number must be 10 digits and should not have the same digit repeated';
       isValid = false;
     }
-    
+
 
     setProfileErrors(errors);
     return isValid;
@@ -277,26 +280,42 @@ const Account = () => {
             {/* Password Change Form */}
             <form onSubmit={handlePasswordChange} className="space-y-6 mt-10">
               <h2 className="text-xl font-semibold">Change your password</h2>
-              <div className="mt-4">
+              {/* New Password Field */}
+              <div className="relative mt-4">
                 <label className="block text-primary">New Password</label>
                 <input
-                  type="password"
-                  className="w-full border p-2 rounded shadow-slate-400 shadow-sm"
+                  type={showPassword ? 'text' : 'password'}
+                  className="w-full border p-2 rounded shadow-slate-400 shadow-sm pr-10"
                   value={passwords.newPassword}
                   onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
                 />
+                <span
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 pt-5 cursor-pointer"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff /> : <Eye />}
+                </span>
                 {passwordErrors.newPassword && <p className="text-red-500 text-sm">{passwordErrors.newPassword}</p>}
               </div>
-              <div className="mt-4">
+
+              {/* Confirm Password Field */}
+              <div className="relative mt-4">
                 <label className="block text-primary">Confirm New Password</label>
                 <input
-                  type="password"
-                  className="w-full border p-2 rounded shadow-slate-400 shadow-sm"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  className="w-full border p-2 rounded shadow-slate-400 shadow-sm pr-10"
                   value={passwords.confirmPassword}
                   onChange={(e) => setPasswords({ ...passwords, confirmPassword: e.target.value })}
                 />
+                <span
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 pt-5 cursor-pointer"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? <EyeOff /> : <Eye />}
+                </span>
                 {passwordErrors.confirmPassword && <p className="text-red-500 text-sm">{passwordErrors.confirmPassword}</p>}
               </div>
+
               <p className="text-primary text-sm mt-2">
                 Password requirements:
                 <br />• At least 8 characters long <br />• Contains letters, at least one digit, and a symbol
