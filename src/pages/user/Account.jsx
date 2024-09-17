@@ -85,10 +85,11 @@ const Account = () => {
       isValid = false;
     }
 
-    if (profile.phone && !/^\d{10}$/.test(profile.phone)) {
-      errors.phone = 'Phone number must be 10 digits';
+    if (profile.phone && (!/^\d{10}$/.test(profile.phone) || /^(.)\1{9}$/.test(profile.phone))) {
+      errors.phone = 'Phone number must be 10 digits and should not have the same digit repeated';
       isValid = false;
     }
+    
 
     setProfileErrors(errors);
     return isValid;

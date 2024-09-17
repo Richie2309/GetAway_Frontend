@@ -54,8 +54,8 @@ const Header = () => {
           message.error('This account is blocked')
           setUser(null);
           navigate('/login');
-        } else if (response.data && response.data.user) {
-          setUser(response.data.user.fullName);
+        } else  {
+          setUser(userData);
         }
       } catch (err) {
         console.error('Error fetching user data', err);

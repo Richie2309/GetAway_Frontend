@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { getAllHotels } from '../../api/user'
 import { useSelector } from 'react-redux'
-import { FaHeart } from 'react-icons/fa'
+// import { FaHeart } from 'react-icons/fa'
 import { Link, useLocation } from 'react-router-dom'
 import Loading from '../../components/user/Loading'
 
 const Explore = () => {
   const [hotels, setHotels] = useState([])
   const [loading, setLoading] = useState(true)
-  const [favorites, setFavorites] = useState({});
+  // const [favorites, setFavorites] = useState({});
   const isAuthenticated = useSelector(state => state.userAuth.isAuthenticated);
   const location = useLocation();
 
@@ -37,12 +37,12 @@ const Explore = () => {
     fetchHotels();
   }, [location.search]);
 
-  const toggleFavorite = (hotelId) => {
-    setFavorites(prev => ({
-      ...prev,
-      [hotelId]: !prev[hotelId]
-    }));
-  };
+  // const toggleFavorite = (hotelId) => {
+  //   setFavorites(prev => ({
+  //     ...prev,
+  //     [hotelId]: !prev[hotelId]
+  //   }));
+  // };
 
   if (loading) {
     return <Loading />;
@@ -69,11 +69,11 @@ const Explore = () => {
             {isAuthenticated && (
               <button
                 className="absolute top-2 right-2"
-                onClick={() => toggleFavorite(hotel._id)}
+                // onClick={() => toggleFavorite(hotel._id)}
               >
-                <FaHeart
+                {/* <FaHeart
                   className={`w-6 h-6 ${favorites[hotel._id] ? 'text-red-500' : 'text-zinc-400'}`}
-                />
+                /> */}
               </button>
             )}
           </div>

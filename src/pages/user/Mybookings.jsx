@@ -3,13 +3,17 @@ import { cancelBooking, getBookedHotels } from '../../api/user'
 import Loading from '../../components/user/Loading';
 import { MdClose, MdOutlineChat } from 'react-icons/md';
 import { ChatScreen } from '../../components/user/ChatScreen';
-import { message } from 'antd';
+import { message, Modal, Input, Button } from 'antd';
 
 const MyBookings = () => {
   const [accommodations, setAccommodations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedHostId, setSelectedHostId] = useState(null);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [cancellationReason, setCancellationReason] = useState('');
+  const [selectedBookingId, setSelectedBookingId] = useState(null);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   useEffect(() => {
     const fetchAccommodations = async () => {
@@ -27,30 +31,39 @@ const MyBookings = () => {
   }, []);
 
   const canCancelBooking = (bookedAt) => {
-    if (!bookedAt) return false; // Ensure bookedAt is valid
+    if (!bookedAt) return false;
     const bookingTime = new Date(bookedAt);
     const currentTime = new Date();
     const timeDiff = currentTime - bookingTime;
-    const hoursDiff = timeDiff / (1000 * 60 * 60); // Convert milliseconds to hours
+    const hoursDiff = timeDiff / (1000 * 60 * 60);
     return hoursDiff <= 24;
   };
 
-  const handleCancelBooking = async (bookingId) => {
+  const handleCancelBooking = async () => {
+    if (!cancellationReason.trim()) {
+      message.error('Please provide a reason for cancellation.');
+      return;
+    }
+
+    setIsCancelling(true);
     try {
-      const response = await cancelBooking(bookingId);      
+      const response = await cancelBooking(selectedBookingId, cancellationReason);
       if (response.status === 200) {
         setAccommodations(prevAccommodations => {
-          // Create a new array with updated accommodations
           const updatedAccommodations = prevAccommodations.map(acc =>
-            acc._id === bookingId ? { ...acc, isCancelled: true } : acc
+            acc._id === selectedBookingId ? { ...acc, isCancelled: true } : acc
           );
-          return [...updatedAccommodations]; // Return a new array reference
+          return [...updatedAccommodations];
         });
         message.success('Booking cancelled successfully. A refund will be initiated.');
+        setIsCancelModalOpen(false);
+        setCancellationReason('');
       }
     } catch (error) {
       console.error("Error cancelling booking", error);
       message.error("Failed to cancel booking. Please try again or contact support.");
+    } finally {
+      setIsCancelling(false);
     }
   }
 
@@ -59,13 +72,19 @@ const MyBookings = () => {
     setIsModalOpen(true);
   };
 
+  const showCancelConfirmation = (bookingId) => {
+    setSelectedBookingId(bookingId);
+    setIsCancelModalOpen(true);
+  };
+
   if (loading) {
     return <Loading />;
   }
+
   return (
     <div className="max-w-4xl mx-auto font-poppins">
       <h2 className="text-2xl font-bold mb-4">My Bookings</h2>
-      <div className="space-y-4 ">
+      <div className="space-y-4">
         {accommodations.length === 0 ? (
           <p>No bookings found.</p>
         ) : (
@@ -108,14 +127,13 @@ const MyBookings = () => {
                   canCancelBooking(accommodation.bookedAt) && (
                     <button
                       className="text-xs text-red-600 p-2 rounded-full shadow-lg"
-                      onClick={() => handleCancelBooking(accommodation.bookingId)}
+                      onClick={() => showCancelConfirmation(accommodation.bookingId)}
                     >
                       Cancel
                     </button>
                   )
                 )}
               </div>
-
             </div>
           ))
         )}
@@ -130,6 +148,38 @@ const MyBookings = () => {
           </div>
         </div>
       )}
+      <Modal
+        title="Cancel Booking"
+        open={isCancelModalOpen}
+        onOk={handleCancelBooking}
+        onCancel={() => {
+          setIsCancelModalOpen(false);
+          setCancellationReason('');
+        }}
+        footer={[
+          <Button key="cancel" onClick={() => setIsCancelModalOpen(false)} disabled={isCancelling}>
+            No, Keep Booking
+          </Button>,
+          <Button
+            key="ok"
+            type="primary"
+            onClick={handleCancelBooking}
+            loading={isCancelling}
+          >
+            Yes, Cancel
+          </Button>,
+        ]}
+      >
+        <p>Are you sure you want to cancel this booking?</p>
+        <Input.TextArea
+          placeholder="Please provide a reason for cancellation"
+          value={cancellationReason}
+          onChange={(e) => setCancellationReason(e.target.value)}
+          rows={4}
+          className="mt-4"
+          disabled={isCancelling}
+        />
+      </Modal>
     </div>
   );
 };

@@ -1,16 +1,21 @@
 import React, { useState } from 'react';
-import getawayLogo from '../../assets/GetAway_logo_admin.png';
-import adminLoginImage from '../../assets/adminLogin.png';
+import { Eye, EyeOff } from 'lucide-react'; // Make sure to import these icons
 import { useForm } from 'react-hook-form';
 import API from '../../services/axios';
+import adminLoginImage from '../../assets/bgadmin.png';
 import adminRoutes from '../../services/endpoints/adminEndpoints';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const AdminLogin = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
+  const [showPassword, setShowPassword] = useState(false);
   const [backendError, setBackendError] = useState({ email: '', password: '' });
   const navigate = useNavigate();
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const onSubmit = async (data) => {
     try {
@@ -26,7 +31,11 @@ const AdminLogin = () => {
         const status = err.response?.status;
         if (status === 401) {
           setBackendError({ email: '', password: 'Invalid email or password' });
+        } else {
+          setBackendError({ email: '', password: 'An error occurred. Please try again.' });
         }
+      } else {
+        setBackendError({ email: '', password: 'An unexpected error occurred.' });
       }
     }
   };
@@ -35,44 +44,62 @@ const AdminLogin = () => {
     setBackendError({ email: '', password: '' });
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      handleSubmit(onSubmit)();
+    }
+  };
+
   return (
-    <div className="relative h-screen w-screen font-poppins">
-      <img src={adminLoginImage} alt="Background of a beautiful pool at sunset" className="absolute inset-0 w-full h-full object-cover" />
-      <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center">
-        <div className="absolute top-4 left-4 text-white text-xl font-bold">ADMIN</div>
-        <img className="mx-14 object-cover h-14 absolute top-4 text-center" src={getawayLogo} alt="GetAway Logo" />
-        <div className="bg-white bg-opacity-80 dark:bg-zinc-800 dark:bg-opacity-80 p-8 rounded-lg shadow-lg w-80">
-          <h2 className="text-center text-2xl font-bold mb-4 text-zinc-900 dark:text-zinc-100">Login</h2>
-          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Email</label>
+    <div className="flex items-center justify-center min-h-screen w-full bg-no-repeat bg-cover bg-center fixed inset-0" style={{ backgroundImage: `url(${adminLoginImage})` }}>
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h2 className="text-center text-2xl font-bold mb-6">Admin Login</h2>
+        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+            <input
+              type="email"
+              id="email"
+              className={`mt-1 block w-full px-3 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm`}
+              placeholder="Email"
+              {...register('email', { required: 'Email is required' })}
+              onChange={clearErrorsOnChange}
+              onKeyDown={handleKeyDown}
+            />
+            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+            {backendError.email && <p className="text-red-500 text-xs mt-1">{backendError.email}</p>}
+          </div>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+            <div className="relative">
               <input
-                type="email"
-                id="email"
-                className={`mt-1 block w-full px-3 py-2 border ${errors.email ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-600'} rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm`}
-                placeholder="Email"
-                {...register('email', { required: 'Email is required' })}
-                onChange={clearErrorsOnChange}
-              />
-              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
-              {backendError.email && <p className="text-red-500 text-xs mt-1">{backendError.email}</p>}
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Password</label>
-              <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 id="password"
-                className={`mt-1 block w-full px-3 py-2 border ${errors.password ? 'border-red-500' : 'border-zinc-300 dark:border-zinc-600'} rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm`}
+                className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
                 placeholder="Password"
                 {...register('password', { required: 'Password is required' })}
                 onChange={clearErrorsOnChange}
+                onKeyDown={handleKeyDown}
               />
-              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
-              {backendError.password && <p className="text-red-500 text-xs mt-1">{backendError.password}</p>}
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                onClick={togglePasswordVisibility}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5 text-gray-400" />
+                ) : (
+                  <Eye className="h-5 w-5 text-gray-400" />
+                )}
+              </button>
             </div>
-            <button type="submit" className="w-full bg-[#65AEF2] text-primary-foreground py-2 px-4 rounded-[20px] hover:bg-[#65AEF2]/80">Login</button>
-          </form>
-        </div>
+            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
+            {backendError.password && <p className="text-red-500 text-xs mt-1">{backendError.password}</p>}
+          </div>
+          <button type="submit" className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors">
+            Login
+          </button>
+        </form>
       </div>
     </div>
   );

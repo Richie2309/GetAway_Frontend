@@ -39,7 +39,7 @@ const TopThree = () => {
       </p>
 
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8" style={{ maxWidth: '90%' }}>
-        {accommodations.length > 0 ? (
+        {accommodations?.length > 0 ? (
           accommodations.map((accommodation, index) => (
             <motion.div
               key={index}
