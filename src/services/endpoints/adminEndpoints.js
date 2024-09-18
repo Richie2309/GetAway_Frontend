@@ -1,5 +1,6 @@
 const adminRoutes = {
     login: '/api/admin/login',
+    // checkAuth:'/api/checkAuth',
     getUser: '/api/admin/getUser',
     toggleBlockUser: '/api/admin/toggleBlockUser',
     getHotels: 'api/admin/getHotels',

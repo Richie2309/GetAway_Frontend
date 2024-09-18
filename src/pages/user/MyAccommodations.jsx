@@ -27,9 +27,9 @@ const MyAccommodations = () => {
     navigate(`/profile/accommodations/add-hotel/${hotelId}`);
   };
 
-  const handleDelete = async (hotelId) => {
-    // navigate(`/profile/accommodations/add-hotel/${hotelId}`);
-  };
+  // const handleDelete = async (hotelId) => {
+  //   // navigate(`/profile/accommodations/add-hotel/${hotelId}`);
+  // };
 
   const handleBookingHistory = (hotelId) => {
     navigate(`/profile/accommodations/bookings/${hotelId}`);
@@ -58,7 +58,7 @@ const MyAccommodations = () => {
         {accommodations.map((accommodation, index) => (
           <AccommodationCard key={index} {...accommodation}
             onEdit={() => handleEdit(accommodation._id)}
-            onDelete={() => handleDelete(accommodation._id)}
+            // onDelete={() => handleDelete(accommodation._id)}
             onBookingHistory={() => handleBookingHistory(accommodation._id)}
           />
         ))}

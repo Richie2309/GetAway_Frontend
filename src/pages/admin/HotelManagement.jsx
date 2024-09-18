@@ -4,38 +4,56 @@ import { getHotelData } from '../../api/admin';
 
 
 const HotelManagement = () => {
-const [hotels,setHotels]=useState([])
+  const [hotels, setHotels] = useState([])
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 2; // Number of items per page
+
+  useEffect(() => {
+    const fetchHotelData = async () => {
+      try {
+        const response = await getHotelData();
+        // Filter for verified hotels only
+        const verifiedHotels = response.data.filter(hotel => hotel.isverified);
+        setHotels(verifiedHotels);
+      } catch (error) {
+        console.error('Error fetching hotel data:', error);
+      }
+    };
+    fetchHotelData();
+  }, []);
 
 
-useEffect(() => {
-  const fetchHotelData = async () => {
-    try {
-      const response = await getHotelData();
-      // Filter for verified hotels only
-      const verifiedHotels = response.data.filter(hotel => hotel.isverified);
-      setHotels(verifiedHotels);
-    } catch (error) {
-      console.error('Error fetching hotel data:', error);
+  // const handleBlockUnblock = async (hotelId) => {
+  //   // try {
+  //   //   const response = await toggleBlockHotel(hotelId);
+  //   //   const updatedHotel = response.data;
+
+  //   //   setHotels((prevHotels) =>
+  //   //     prevHotels.map((hotel) =>
+  //   //       hotel._id === updatedHotel._id ? updatedHotel : hotel
+  //   //     )
+  //   //   );
+  //   // } catch (error) {
+  //   //   console.error('Error toggling block status:', error);
+  //   // }
+  // };
+
+  const filteredHotels = hotels.filter(hotel =>
+    hotel.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredHotels.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentPageHotels = filteredHotels.slice(startIndex, startIndex + itemsPerPage);
+
+  const handlePageChange = (direction) => {
+    if (direction === 'prev' && currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    } else if (direction === 'next' && currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
     }
   };
-  fetchHotelData();
-}, []);
-
-
-const handleBlockUnblock = async (hotelId) => {
-  // try {
-  //   const response = await toggleBlockHotel(hotelId);
-  //   const updatedHotel = response.data;
-
-  //   setHotels((prevHotels) =>
-  //     prevHotels.map((hotel) =>
-  //       hotel._id === updatedHotel._id ? updatedHotel : hotel
-  //     )
-  //   );
-  // } catch (error) {
-  //   console.error('Error toggling block status:', error);
-  // }
-};
 
   return (
     <section className="bg-zinc-100 p-3 sm:p-5 w-full h-screen font-poppins">
@@ -74,13 +92,16 @@ const handleBlockUnblock = async (hotelId) => {
                   <input
                     type="text"
                     id="simple-search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="Search"
                   />
+
                 </div>
               </form>
             </div>
-   
+
           </div>
           <button
             className="inline-flex items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 mt-4 mb-4 ml-1"
@@ -99,42 +120,43 @@ const handleBlockUnblock = async (hotelId) => {
                   <th scope="col" className="px-4 py-3">
                     S.No
                   </th>
-                 
+
                   <th scope="col" className="px-4 py-3">
                     Accommodation
                   </th>
                   <th scope="col" className="px-4 py-3">
                     Status
                   </th>
-                  <th scope="col" className="px-4 py-3">
+                  {/* <th scope="col" className="px-4 py-3">
                     Actions
-                  </th>
+                  </th> */}
 
                 </tr>
               </thead>
               <tbody>
-                {hotels.map((hotel, index) => (
+                {currentPageHotels.map((hotel, index) => (
                   <tr key={hotel._id}>
-                    <td className="px-4 py-3">{index + 1}</td>
+                    <td className="px-4 py-3">{startIndex + index + 1}</td>
                     <td className="px-4 py-3">{hotel.title}</td>
                     <td className="px-4 py-3">{hotel.isverified ? 'Verified' : 'Not Verified'}</td>
-                    <td className="px-4 py-3">
+                    {/* <td className="px-4 py-3">
                       <button
                         onClick={() => handleBlockUnblock(hotel._id)}
                         className={`px-3 py-2 rounded ${hotel.isBlocked ? 'bg-red-500' : 'bg-green-500'} text-white`}
                       >
                         {hotel.isBlocked ? 'Unblock' : 'Block'}
                       </button>
-                    </td>
+                    </td> */}
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
           <div className="flex items-center justify-between p-4">
-            <a
-              href="#"
+            <button
+              onClick={() => handlePageChange('prev')}
               className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700"
+              disabled={currentPage === 1}
             >
               Previous
               <svg
@@ -152,10 +174,14 @@ const handleBlockUnblock = async (hotelId) => {
                   d="M15 19l-7-7 7-7"
                 ></path>
               </svg>
-            </a>
-            <a
-              href="#"
+            </button>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-400">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => handlePageChange('next')}
               className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700"
+              disabled={currentPage === totalPages}
             >
               Next
               <svg
@@ -173,7 +199,7 @@ const handleBlockUnblock = async (hotelId) => {
                   d="M9 5l7 7-7 7"
                 ></path>
               </svg>
-            </a>
+            </button>
           </div>
         </div>
       </div>

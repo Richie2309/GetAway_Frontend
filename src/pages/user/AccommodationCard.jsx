@@ -1,7 +1,7 @@
 import React from 'react'
-import { MdAccessTime, MdCreate, MdDeleteOutline } from "react-icons/md";
+import { MdAccessTime, MdCreate } from "react-icons/md";
 
-const AccommodationCard = ({ photos, town, district, state, maxGuests, bedrooms, beds, price_per_night, isverified, onEdit, onDelete, onBookingHistory }) => {
+const AccommodationCard = ({ photos, town, district, state, maxGuests, bedrooms, beds, price_per_night, isverified, onEdit, onBookingHistory }) => {
 
   return (
     <div className="bg-gray-200 rounded-lg flex items-center h-32 space-x-6 shadow-xl font-poppins">
@@ -23,9 +23,9 @@ const AccommodationCard = ({ photos, town, district, state, maxGuests, bedrooms,
           <button className="text-blue-500 mx-2" onClick={onEdit}>
             <MdCreate className='text-lg' />
           </button>
-          <button className="text-red-500 mx-2" onClick={onDelete}>
+          {/* <button className="text-red-500 mx-2" onClick={onDelete}>
             <MdDeleteOutline className='text-lg' />
-          </button>
+          </button> */}
         </div>
       )}
     </div>

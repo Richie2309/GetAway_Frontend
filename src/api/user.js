@@ -239,9 +239,9 @@ export const getBookedHotels = async () => {
 }
 
 //To cancel the booking
-export const cancelBooking = async (bookingId) => {
+export const cancelBooking = async (bookingId,cancellationReason) => {
   try {
-    const response = await API.post(`${userRoutes.cancelBooking}/${bookingId}`);
+    const response = await API.post(`${userRoutes.cancelBooking}/${bookingId}`, { cancellationReason });
     return response;
   } catch (err) {
     console.error('Error cancelling booking:', err);

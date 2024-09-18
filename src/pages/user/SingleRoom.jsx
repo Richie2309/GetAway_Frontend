@@ -258,7 +258,6 @@ const SingleRoom = () => {
       </div>
 
       {/* Reviews */}
-      {/* Reviews */}
       <div className="mt-8">
         <h2 className="text-xl font-bold mb-4">Reviews ({reviews.length})</h2>
         {canReview && (
