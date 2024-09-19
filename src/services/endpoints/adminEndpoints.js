@@ -1,6 +1,7 @@
 const adminRoutes = {
     login: '/api/admin/login',
-    // checkAuth:'/api/checkAuth',
+    logout: '/api/admin/logout',
+    checkAuth:'/api/admin/checkAuth',
     getUser: '/api/admin/getUser',
     toggleBlockUser: '/api/admin/toggleBlockUser',
     getHotels: 'api/admin/getHotels',
@@ -10,7 +11,7 @@ const adminRoutes = {
     getDailySales: '/api/admin/sales/daily',
     // getWeeklySales: '/api/admin/sales/weekly',
     getMonthlySales: '/api/admin/sales/monthly',
-    dashboard:'/api/admin/dashboard-stats'
+    dashboard: '/api/admin/dashboard-stats'
 }
 
 export default adminRoutes

@@ -4,7 +4,7 @@ const initialState = {
     isAdminAuthenticated: false
 }
 
-const authSlice = createSlice({
+const adminAuthSlice = createSlice({
     name: 'adminAuth',
     initialState,
     reducers: {
@@ -17,5 +17,5 @@ const authSlice = createSlice({
     }
 })
 
-export const { login, logout } = authSlice.actions
-export default authSlice.reducer
+export const { login, logout } = adminAuthSlice.actions
+export default adminAuthSlice.reducer

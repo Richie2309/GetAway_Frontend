@@ -1,6 +1,16 @@
 import API from "../services/axios"
 import adminRoutes from '../services/endpoints/adminEndpoints'
 
+export const adminLogout = async () => {
+  try {
+    const response = await API.post(adminRoutes.logout)
+    return response
+  } catch (err) {
+    console.error('Error loggin out');
+    throw err
+  }
+}
+
 export const getUserData = async () => {
   try {
     const response = await API.get(adminRoutes.getUser)
@@ -77,7 +87,7 @@ export const getMonthlySales = async () => {
 
 export const getDashboardStats = async () => {
   try {
-    const response = await API.get(adminRoutes.dashboard);        
+    const response = await API.get(adminRoutes.dashboard);
     return response.data;
   } catch (err) {
     console.error('Error fetching dashboard stats:', err);

@@ -35,7 +35,7 @@ const UserManagement = () => {
       console.error('Error toggling block status:', error);
     }
   };
-
+ 
   const filteredUsers = users.filter(user =>
     user.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     user.email.toLowerCase().includes(searchQuery.toLowerCase())

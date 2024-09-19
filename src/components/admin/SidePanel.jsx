@@ -4,20 +4,31 @@ import { FaChartPie } from "react-icons/fa";
 import { FaCircleUser } from "react-icons/fa6";
 import { FaHotel } from "react-icons/fa6";
 import { BiSolidLogOut } from "react-icons/bi";
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import getawayLogo from '../../assets/GetAway_logo.png';
+import { adminLogout } from '../../api/admin';
+import { useDispatch } from 'react-redux';
+import { logout } from '../../redux/slice/adminAuthSlice';
 
 const SidePanel = () => {
   const location = useLocation();
+  const navigate = useNavigate();  
+  const dispatch = useDispatch();
   const noSidebarRoutes = ['/admin/login'];
 
   const showSidebar = !noSidebarRoutes.includes(location.pathname);
 
   const isActive = (path) => location.pathname === path;
 
-  const handleLogout = () => {
-
+  const handleLogout = async () => {
+    try {
+      await adminLogout();
+      dispatch(logout());
+      navigate('/admin/login');
+    } catch (err) {
+      console.error('Error logging out:', err);
+    }
   }
 
   return (

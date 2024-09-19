@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import API from '../../services/axios';
@@ -6,13 +6,31 @@ import adminLoginImage from '../../assets/bgadmin.png';
 import adminRoutes from '../../services/endpoints/adminEndpoints';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { login } from '../../redux/slice/adminAuthSlice';
 
 const AdminLogin = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [showPassword, setShowPassword] = useState(false);
   const [backendError, setBackendError] = useState({ email: '', password: '' });
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        const response = await API.get(adminRoutes.checkAuth);
+        if (response.status === 200) {
+          navigate('/admin/dashboard');
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    };
+
+    checkAuthStatus();
+  }, [navigate]);
+  
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -22,8 +40,9 @@ const AdminLogin = () => {
       const { email, password } = data;
       const response = await API.post(adminRoutes.login, { email, password });
       if (response.status === 200) {
+        dispatch(login());
         navigate('/admin/dashboard');
-      } else {
+      } else { 
         setBackendError({ email: '', password: 'Invalid email or password' });
       }
     } catch (err) {

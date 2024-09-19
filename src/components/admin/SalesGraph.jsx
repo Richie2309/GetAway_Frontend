@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { getDailySales, getMonthlySales } from '../../api/admin';
+import { getDailySales } from '../../api/admin';
 
+// Initialize data for the entire year
 const initializeData = (type) => {
   const data = [];
   const now = new Date();
@@ -25,47 +26,37 @@ const initializeData = (type) => {
 
 const SalesGraph = () => {
   const [timeFrame, setTimeFrame] = useState('daily');
+  const [month, setMonth] = useState(new Date().getMonth()); // Initialize with current month
   const [data, setData] = useState(initializeData('daily'));
+  const [salesData, setSalesData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let result = [];
-        if (timeFrame === 'daily') {
-          result = await getDailySales();
-        } else if (timeFrame === 'monthly') {
-          result = await getMonthlySales();
-        }
-
-        // Merge the result with the initialized data
-        const initializedData = initializeData(timeFrame);
-        result.forEach(item => {
-          if (timeFrame === 'daily') {
-            const itemDate = new Date(item.date);
-            if (itemDate.getMonth() === new Date().getMonth() && 
-                itemDate.getFullYear() === new Date().getFullYear()) {
-              const dayOfMonth = itemDate.getDate();
-              const index = initializedData.findIndex(dataPoint => parseInt(dataPoint.name) === dayOfMonth);
-              if (index !== -1) {
-                initializedData[index].totalSales = item.totalSales;
-              }
-            }
-          } else if (timeFrame === 'monthly') {
-            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const monthIndex = new Date(item.month).getMonth();
-            const index = initializedData.findIndex(dataPoint => dataPoint.name === monthNames[monthIndex]);
-            if (index !== -1) {
-              initializedData[index].totalSales = item.totalSales;
-            }
-          }
-        });
-        setData(initializedData);
+        const result = await getDailySales();
+        setSalesData(result); // Store the entire year's sales data
       } catch (error) {
         console.error('Error fetching sales data:', error);
       }
     };
     fetchData();
-  }, [timeFrame]);
+  }, []);
+
+  // Filter data based on selected month
+  useEffect(() => {
+    const filteredData = initializeData(timeFrame);
+    salesData.forEach(item => {
+      const itemDate = new Date(item.date);
+      if (timeFrame === 'daily' && itemDate.getMonth() === month && itemDate.getFullYear() === new Date().getFullYear()) {
+        const dayOfMonth = itemDate.getDate();
+        const index = filteredData.findIndex(dataPoint => parseInt(dataPoint.name) === dayOfMonth);
+        if (index !== -1) {
+          filteredData[index].totalSales = item.totalSales;
+        }
+      }
+    });
+    setData(filteredData);
+  }, [salesData, month, timeFrame]);
 
   return (
     <div className="bg-white rounded-lg shadow-md">
@@ -87,12 +78,31 @@ const SalesGraph = () => {
           ))}
         </div>
       </div>
+
+      {timeFrame === 'daily' && (
+        <div className="mb-4">
+          <label htmlFor="month-select" className="mr-2">Select Month:</label>
+          <select
+            id="month-select"
+            value={month}
+            onChange={(e) => setMonth(parseInt(e.target.value))}
+            className="bg-gray-200 p-2 rounded"
+          >
+            {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m, index) => (
+              <option key={index} value={index}>
+                {m}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       <div style={{ width: '100%', overflowX: 'auto' }}>
         <div style={{ width: timeFrame === 'daily' ? '1200px' : '100%', height: '300px' }}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" interval={0} padding={{ left: 10, right: 10 }}/>
+              <XAxis dataKey="name" interval={0} padding={{ left: 10, right: 10 }} />
               <YAxis />
               <Tooltip />
               <Legend />
