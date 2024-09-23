@@ -13,6 +13,7 @@ import userRoutes from '../services/endpoints/userEndpoints';
 import API from '../services/axios';
 import { userData } from '../redux/slice/userAuthSlice';
 import SingleRoom from '../pages/user/SingleRoom';
+import NotFoundPage from '../components/common/NotFoundPage';
 
 const UserRoutes = () => {
   const isLoggedIn = useSelector((state) => state.userAuth.isAuthenticated);
@@ -43,7 +44,7 @@ const UserRoutes = () => {
       {!isLoggedIn ? (
         <>
           <Route path='/signup' element={<Signup />} />
-          <Route path='/login' element={<Signin />} />
+          <Route path='/login' element={<Signin />} />         
           <Route path='/forgotpassword' element={<ForgotPassword />} />
           <Route path='/reset-password' element={<ResetPassword />} />
         </>
@@ -59,6 +60,7 @@ const UserRoutes = () => {
         <Route path='/hotel/:id' element={<SingleRoom />} />
         <Route path='/profile/*' element={<PrivateRoutes />} />
       </Route>
+      <Route path="/*" element={<NotFoundPage />} />
     </Routes>
   );
 };

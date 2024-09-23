@@ -3,15 +3,14 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { getDailySales } from '../../api/admin';
 
 // Initialize data for the entire year
-const initializeData = (type) => {
+const initializeData = (type, month) => {
   const data = [];
   const now = new Date();
+  const currentYear = now.getFullYear();
 
   if (type === 'daily') {
-    // Initialize data for all dates of the current month
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth();
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    // Set the number of days based on the selected month
+    const daysInMonth = new Date(currentYear, month + 1, 0).getDate(); // Calculate the correct number of days in the selected month
     for (let i = 1; i <= daysInMonth; i++) {
       data.push({ name: `${i}`, totalSales: 0 });
     }
@@ -20,9 +19,10 @@ const initializeData = (type) => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     months.forEach(month => data.push({ name: month, totalSales: 0 }));
   }
-  
+
   return data;
 };
+
 
 const SalesGraph = () => {
   const [timeFrame, setTimeFrame] = useState('daily');
@@ -43,20 +43,25 @@ const SalesGraph = () => {
   }, []);
 
   // Filter data based on selected month
-  useEffect(() => {
-    const filteredData = initializeData(timeFrame);
-    salesData.forEach(item => {
-      const itemDate = new Date(item.date);
-      if (timeFrame === 'daily' && itemDate.getMonth() === month && itemDate.getFullYear() === new Date().getFullYear()) {
-        const dayOfMonth = itemDate.getDate();
-        const index = filteredData.findIndex(dataPoint => parseInt(dataPoint.name) === dayOfMonth);
-        if (index !== -1) {
-          filteredData[index].totalSales = item.totalSales;
-        }
+// Filter data based on selected month
+useEffect(() => {
+  const filteredData = initializeData(timeFrame, month); // Pass the selected month here
+  salesData.forEach(item => {
+    const itemDate = new Date(item.date);
+    if (timeFrame === 'daily' && itemDate.getMonth() === month && itemDate.getFullYear() === new Date().getFullYear()) {
+      const dayOfMonth = itemDate.getDate();
+      const index = filteredData.findIndex(dataPoint => parseInt(dataPoint.name) === dayOfMonth);
+      if (index !== -1) {
+        filteredData[index].totalSales = item.totalSales;
       }
-    });
-    setData(filteredData);
-  }, [salesData, month, timeFrame]);
+    } else if (timeFrame === 'monthly' && itemDate.getFullYear() === new Date().getFullYear()) {
+      const monthIndex = itemDate.getMonth();
+      filteredData[monthIndex].totalSales += item.totalSales;
+    }
+  });
+  setData(filteredData);
+}, [salesData, month, timeFrame]);
+
 
   return (
     <div className="bg-white rounded-lg shadow-md">

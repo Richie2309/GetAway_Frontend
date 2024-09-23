@@ -7,6 +7,7 @@ import MyAccommodations from '../../pages/user/MyAccommodations';
 import MyBookings from '../../pages/user/Mybookings';
 import ProfileSidebar from './ProfileSidebar';
 import GuestManagement from '../../pages/user/GuestManagement';
+import NotFoundPage from '../common/NotFoundPage';
 
 const PrivateRoute = ({ condition, redirectTo, children }) => {
   return condition ? children : <Navigate to={redirectTo} replace />;
@@ -32,6 +33,7 @@ const PrivateRoutes = () => {
         <Route path="accommodations/bookings/:hotelId?" element={<GuestManagement />} />
         <Route path="revenue" element={<Account />} />
       </Route>
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 };
