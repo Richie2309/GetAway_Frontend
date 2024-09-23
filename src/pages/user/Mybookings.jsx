@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { cancelBooking, getBookedHotels } from '../../api/user'
+import { cancelBooking, getBookedHotels } from '../../api/user';
 import Loading from '../../components/user/Loading';
 import { MdClose, MdOutlineChat } from 'react-icons/md';
 import { ChatScreen } from '../../components/user/ChatScreen';
@@ -14,6 +14,7 @@ const MyBookings = () => {
   const [cancellationReason, setCancellationReason] = useState('');
   const [selectedBookingId, setSelectedBookingId] = useState(null);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [filter, setFilter] = useState('upcoming'); // Filter state for 'upcoming' or 'all'
 
   useEffect(() => {
     const fetchAccommodations = async () => {
@@ -77,6 +78,10 @@ const MyBookings = () => {
     setIsCancelModalOpen(true);
   };
 
+  const filteredAccommodations = accommodations.filter(acc =>
+    filter === 'upcoming' ? acc.status === 'Booked' : acc.status !== 'Booked'
+  );
+
   if (loading) {
     return <Loading />;
   }
@@ -84,11 +89,31 @@ const MyBookings = () => {
   return (
     <div className="max-w-4xl mx-auto font-poppins">
       <h2 className="text-2xl font-bold mb-4">My Bookings</h2>
+      <div className="flex space-x-2 mb-4">
+        <Button
+          onClick={() => setFilter('upcoming')}
+          style={{
+            backgroundColor: filter === 'upcoming' ? '#ffcccc' : 'transparent',
+            color: filter === 'upcoming' ? '#ff0000' : 'inherit',
+          }}
+        >
+          Upcoming
+        </Button>
+        <Button
+          onClick={() => setFilter('all')}
+          style={{
+            backgroundColor: filter === 'all' ? '#ffcccc' : 'transparent',
+            color: filter === 'all' ? '#ff0000' : 'inherit',
+          }}
+        >
+          All
+        </Button>
+      </div>
       <div className="space-y-4">
-        {accommodations.length === 0 ? (
+        {filteredAccommodations.length === 0 ? (
           <p>No bookings found.</p>
         ) : (
-          accommodations.map((accommodation, index) => (
+          filteredAccommodations.map((accommodation, index) => (
             <div key={index} className="relative bg-gray-200 rounded-lg shadow-xl flex items-center h-32 space-x-6">
               <img src={accommodation.accommodation.photos[0]} alt={accommodation.accommodation.title} className="w-48 h-32 object-cover rounded-xl shadow-lg" />
               <div>

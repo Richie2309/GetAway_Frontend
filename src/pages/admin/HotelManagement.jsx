@@ -7,13 +7,12 @@ const HotelManagement = () => {
   const [hotels, setHotels] = useState([])
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 2; // Number of items per page
+  const itemsPerPage = 2; 
 
   useEffect(() => {
     const fetchHotelData = async () => {
       try {
         const response = await getHotelData();
-        // Filter for verified hotels only
         const verifiedHotels = response.data.filter(hotel => hotel.isverified);
         setHotels(verifiedHotels);
       } catch (error) {
