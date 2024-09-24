@@ -6,6 +6,7 @@ const adminRoutes = {
     toggleBlockUser: '/api/admin/toggleBlockUser',
     getHotels: 'api/admin/getHotels',
     getHotelById: '/api/admin/getHotelById',
+    getHotelDetailsById:'/api/admin/getHotelDetailsById',
     approveHotel: '/api/admin/approve-hotel',
     rejectHotel: '/api/admin/reject-hotel',
     getDailySales: '/api/admin/sales/daily',

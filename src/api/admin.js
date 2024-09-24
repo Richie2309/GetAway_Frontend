@@ -50,6 +50,16 @@ export const getHotelById = async (hotelId) => {
   }
 }
 
+export const getHotelDetailsById=async(hotelId)=>{
+  try {
+    const response = await API.get(`${adminRoutes.getHotelDetailsById}/${hotelId}`);
+    return response;
+  } catch (err) {
+    console.error('Error getting hotel details');
+    throw err;
+  }
+}
+
 export const approveHotel = async (hotelId) => {
   try {
     const response = await API.post(`${adminRoutes.approveHotel}/${hotelId}`);
@@ -67,7 +77,7 @@ export const rejectHotel = async (hotelId, reason) => {
   } catch (err) {
     console.error('Error rejecting hotel:', err);
     throw err;
-  }
+  } 
 };
 
 export const getDailySales = async () => {

@@ -33,7 +33,7 @@ const SingleRoom = () => {
 
   useEffect(() => {
     const fetchHotelData = async () => {
-      try {
+      try { 
         const response = await getHotelData(id);
         setHotelData(response.data.hotel);
 

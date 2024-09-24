@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getHotelData } from '../../api/admin';
+import { getHotelData, getHotelDetailsById } from '../../api/admin';
 
 
 const HotelManagement = () => {
   const [hotels, setHotels] = useState([])
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 2; 
+  const [selectedHotel, setSelectedHotel] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const itemsPerPage = 2;
 
   useEffect(() => {
     const fetchHotelData = async () => {
@@ -37,6 +39,23 @@ const HotelManagement = () => {
   //   //   console.error('Error toggling block status:', error);
   //   // }
   // };
+
+  const handleRowClick = async (hotelId) => {
+    try {
+      const response = await getHotelDetailsById(hotelId);
+      console.log('ree', response.data);
+
+      setSelectedHotel(response.data);
+      setShowModal(true);
+    } catch (error) {
+      console.error('Error fetching hotel details:', error);
+    }
+  };
+
+  const closeModal = () => {
+    setShowModal(false); // Close modal
+    setSelectedHotel(null); // Clear selected hotel data
+  };
 
   const filteredHotels = hotels.filter(hotel =>
     hotel.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -116,25 +135,15 @@ const HotelManagement = () => {
             <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
               <thead className="bg-gray-50 dark:bg-gray-700 text-xs uppercase text-gray-700 dark:text-gray-400">
                 <tr>
-                  <th scope="col" className="px-4 py-3">
-                    S.No
-                  </th>
-
-                  <th scope="col" className="px-4 py-3">
-                    Accommodation
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Status
-                  </th>
-                  {/* <th scope="col" className="px-4 py-3">
-                    Actions
-                  </th> */}
-
+                  <th scope="col" className="px-4 py-3">S.No</th>
+                  <th scope="col" className="px-4 py-3">Accommodation</th>
+                  <th scope="col" className="px-4 py-3">Status</th>
+                  {/* <th scope="col" className="px-4 py-3">Actions</th> */}
                 </tr>
               </thead>
               <tbody>
                 {currentPageHotels.map((hotel, index) => (
-                  <tr key={hotel._id}>
+                  <tr key={hotel._id} onClick={() => handleRowClick(hotel._id)}>
                     <td className="px-4 py-3">{startIndex + index + 1}</td>
                     <td className="px-4 py-3">{hotel.title}</td>
                     <td className="px-4 py-3">{hotel.isverified ? 'Verified' : 'Not Verified'}</td>
@@ -151,6 +160,40 @@ const HotelManagement = () => {
               </tbody>
             </table>
           </div>
+
+          {showModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+               <div className="bg-white p-5  max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+                {/* Host Details Section */}
+                <h2 className="text-xl font-bold mb-4">Host Details</h2>
+                <p><strong>Username:</strong> {selectedHotel?.added_by.fullName}</p>
+                <p><strong>Email:</strong> {selectedHotel?.added_by.email}</p>
+                <p><strong>Phone:</strong> {selectedHotel?.added_by.phone}</p>
+
+                {/* Accommodation Details Section */}
+                <h2 className="text-xl font-bold mt-6 mb-4">Accommodation Details</h2>
+                <p><strong>Title:</strong> {selectedHotel?.title}</p>
+                <img src={selectedHotel?.photos[0]} alt="Accommodation" className="w-full h-auto" />
+                <p><strong>Description:</strong> {selectedHotel?.description}</p>
+                <p><strong>Check-in Time:</strong> {selectedHotel?.checkinTime}</p>
+                <p><strong>Check-out Time:</strong> {selectedHotel?.checkoutTime}</p>
+                <p><strong>Max Guests:</strong> {selectedHotel?.maxGuests}</p>
+                <p><strong>Bedrooms:</strong> {selectedHotel?.bedrooms}</p>
+                <p><strong>Beds:</strong> {selectedHotel?.beds}</p>
+                <p><strong>Bathrooms:</strong> {selectedHotel?.bathrooms}</p>
+                <p><strong>Perks:</strong> {selectedHotel?.perks?.join(', ')}</p>
+                <p><strong>Town:</strong> {selectedHotel?.town}</p>
+                <p><strong>District:</strong> {selectedHotel?.district}</p>
+                <p><strong>State:</strong> {selectedHotel?.state}</p>
+                <p><strong>Address:</strong> {selectedHotel?.address}</p>
+                <p><strong>Pincode:</strong> {selectedHotel?.pincode}</p>
+                <p><strong>Price per Night:</strong> ${selectedHotel?.pricePerNight}</p>
+
+                <button onClick={closeModal} className="mt-4 px-4 py-2 bg-red-400 text-white rounded-lg">Close</button>
+              </div>
+            </div>
+          )}
+
           <div className="flex items-center justify-between p-4">
             <button
               onClick={() => handlePageChange('prev')}
