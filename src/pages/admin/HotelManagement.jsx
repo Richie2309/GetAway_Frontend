@@ -43,8 +43,6 @@ const HotelManagement = () => {
   const handleRowClick = async (hotelId) => {
     try {
       const response = await getHotelDetailsById(hotelId);
-      console.log('ree', response.data);
-
       setSelectedHotel(response.data);
       setShowModal(true);
     } catch (error) {
@@ -143,7 +141,7 @@ const HotelManagement = () => {
               </thead>
               <tbody>
                 {currentPageHotels.map((hotel, index) => (
-                  <tr key={hotel._id} onClick={() => handleRowClick(hotel._id)}>
+                  <tr key={hotel._id} onClick={() => handleRowClick(hotel._id)} className='cursor-pointer'>
                     <td className="px-4 py-3">{startIndex + index + 1}</td>
                     <td className="px-4 py-3">{hotel.title}</td>
                     <td className="px-4 py-3">{hotel.isverified ? 'Verified' : 'Not Verified'}</td>
@@ -187,7 +185,7 @@ const HotelManagement = () => {
                 <p><strong>State:</strong> {selectedHotel?.state}</p>
                 <p><strong>Address:</strong> {selectedHotel?.address}</p>
                 <p><strong>Pincode:</strong> {selectedHotel?.pincode}</p>
-                <p><strong>Price per Night:</strong> ${selectedHotel?.pricePerNight}</p>
+                <p><strong>Price per Night:</strong> ${selectedHotel?.price_per_night}</p>
 
                 <button onClick={closeModal} className="mt-4 px-4 py-2 bg-red-400 text-white rounded-lg">Close</button>
               </div>

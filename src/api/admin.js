@@ -71,8 +71,8 @@ export const approveHotel = async (hotelId) => {
 };
 
 export const rejectHotel = async (hotelId, reason) => {
-  try {
-    const response = await API.patch(adminRoutes.rejectHotel, { hotelId, reason });
+  try {    
+    const response = await API.patch(`${adminRoutes.rejectHotel}/${hotelId}`, { reason });
     return response.data;
   } catch (err) {
     console.error('Error rejecting hotel:', err);

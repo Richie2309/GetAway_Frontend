@@ -29,9 +29,9 @@ const VerifyHotel = () => {
     }
 
     try {
-      await rejectHotel({ hotelId, rejectionReason });
+      await rejectHotel(hotelId, rejectionReason );
       alert('Hotel rejected successfully');
-
+      navigate('/admin/hotel-management')
     } catch (error) {
       console.error('Error rejecting hotel:', error);
     }
@@ -42,7 +42,7 @@ const VerifyHotel = () => {
       await approveHotel(hotelId); // You need to implement this
       alert('Hotel approved successfully');
 
-navigate('/admin/hotel-management')
+      navigate('/admin/hotel-management')
     } catch (error) {
       console.error('Error approving hotel:', error);
     }
