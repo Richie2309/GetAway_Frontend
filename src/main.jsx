@@ -9,7 +9,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { SocketContextProvider } from './context/SocketContext.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <GoogleOAuthProvider clientId='720734685234-dnl5v0vu72rc0guelqokjn9oq88jrvoi.apps.googleusercontent.com'>
+  <GoogleOAuthProvider clientId='463638957160-fd1oul1v1q7ienf7r8uol6en417gdsiu.apps.googleusercontent.com'>
     <BrowserRouter>
       <Provider store={store}>
         <SocketContextProvider>
