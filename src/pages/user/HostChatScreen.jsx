@@ -162,15 +162,15 @@ const HostChatScreen = () => {
 
   const stopRecording = () => {
     setIsRecording(false);
-  
+
     if (audioRef.current && audioRef.current.state !== "inactive") {
       audioRef.current.stop();
     } else {
       console.error('MediaRecorder is not initialized.');
     }
   };
-  
-  
+
+
 
   const handleEmojiClick = (emojiObject) => {
     setNewMessage((prevMessage) => prevMessage + emojiObject.emoji);
@@ -275,7 +275,7 @@ const HostChatScreen = () => {
                 <button onClick={() => fileInputRef.current.click()} className="ml-2 p-2 text-primary hover:text-primary/80 transition duration-200" title="Send File">
                   <MdAttachFile size={24} />
                 </button>
-                <button
+                {/* <button
                   onMouseDown={startRecording}
                   onMouseUp={stopRecording}
                   className={`p-2 text-primary hover:text-primary/80 transition duration-200 ${isRecording ? 'text-red-500' : ''}`}
@@ -285,7 +285,7 @@ const HostChatScreen = () => {
                 </button>
                 {audioBlob && (
                   <span className="text-sm text-green-500">Audio recorded</span>
-                )}
+                )} */}
                 <button onClick={handleSendMessage}
                   className="bg-blue-500 text-white rounded-r-lg px-4 py-2">
                   <MdSend size={20} />
