@@ -214,7 +214,7 @@ export const ChatScreen = ({ hostId }) => {
         <button onClick={() => fileInputRef.current.click()} className="ml-2 p-2 text-primary hover:text-primary/80 transition duration-200" title="Send File">
           <MdAttachFile size={24} />
         </button>
-        <button
+        {/* <button
           onMouseDown={startRecording}
           onMouseUp={stopRecording}
           className={`p-2 text-primary hover:text-primary/80 transition duration-200 ${isRecording ? 'text-red-500' : ''}`}
@@ -224,7 +224,7 @@ export const ChatScreen = ({ hostId }) => {
         </button>
         {audioBlob && (
           <span className="text-sm text-green-500">Audio recorded</span>
-        )}
+        )} */}
         <button
           onClick={handleSendMessage}
           disabled={newMessage.trim() === '' && !file && !audioBlob}
